@@ -119,6 +119,17 @@ Este microservicio expone varios endpoints RESTful. A continuación, algunos eje
 2. **Configuración de Swagger:** Detalles de la API e información de contacto del equipo incluidos.
 
 
+¿Preguntas a tener en cuenta?
+
+1.¿Cuales son las salas?
+2.¿Puedo modificar mis horarios por medio de un endpoint que me da el modulo de usuarios o lo hago yo y ya?
+3.¿Cuantas y cuales son las salas crea?
+4.¿Como manejamos las personas que van con la reserva?, porque si van muchos todos deben
+	registrarse, entonces registramos a todas esas personas? o simplemente dejamos a 
+	el que reserva como encargado y ya, o mejor registramos a todas las personas en la reserva 
+	que se quiera hacer.
+5.¿Solo se puede pedir un elemento recreacional a la vez?
+
 
 ## Licencia
 
