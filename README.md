@@ -3,12 +3,18 @@
 
 ## Equipo de Desarrollo
 
+### Roles
+- **Lider Técnico: 1**
+- **Back: 1**
+- **DevOps 1**
+- **Front: 2**
+
 ### Squad Apolo
-- **Lider Técnico:** [Nicolas Pachon](https://github.com/cedab23)    
-- **Back & DevOps:** [Sergio Silva](https://github.com/OneCode182)
-- **Back & DevOps:** [Santiago Amador](https://github.com/santiago-amador/)
-- **Front:** [Juan Lozano](https://github.com/juanLozano-2004/)
-- **Front:** [David Sarria](https://github.com/DASarria)
+- **Dev #1:** [Nicolas Pachon](https://github.com/cedab23)    
+- **Dev #2:** [Sergio Silva](https://github.com/OneCode182)
+- **Dev #3:** [Santiago Amador](https://github.com/santiago-amador/)
+- **Dev #4:** [Juan Lozano](https://github.com/juanLozano-2004/)
+- **Dev #5:** [David Sarria](https://github.com/DASarria)
 
 
 
@@ -28,27 +34,60 @@ Este repositorio contiene un microservicio backend en **Java con Spring Boot**, 
 
 ## Stack de Tecnología y Herramientas
 - **Lenguaje:** Java 17+
-- **Framework Backend:** SpringBoot 3.4.4 con Maven 3.x.x
+- **Framework Backend:** SpringBoot 3.4.x con Maven 3.x.x
 - **Base de Datos:** MongoDB Atlas Cloud Cluster
 - **DevOps:** Azure y GitHub Actions
 - **Entorno de Desarrollo**: IntelliJ IDEA
 - **Test de Endpoints:** Postman
 - **Diagramas:** Astah y [Miro](https://miro.com/es/)
-- 
-
-
-## Dependencias
-
-- **1) Persistencia (NOSQL):** Spring Data MongoDB
-- **2) Refactor (DEVTOOLS):** Lombok
-- **3) Desarrollo (DEVTOOLS):** Spring Boot DevTools
-- **4) Servidor Web (WEB):** Spring Web
-- **5) Api (WEB):** Rest Repositories
-- **6) Pruebas TDD (TESTING):** JUnit 5
 
 
 ## Scaffolding
 
+#### Parámetros
+```yml
+Java Version: 17
+Spring Boot Version: 3.4.5
+Grupo: eci.cvds 
+Artefacto: mod2 
+Paquete: eci.cvds.mod2
+```
+
+#### Dependencias Base
+
+- **1) Spring Data MongoDB (NOSQL):** Facilita la integración con MongoDB y proporciona un repositorio para operaciones CRUD y consultas avanzadas, mapeando documentos a objetos Java.
+
+- **2) Lombok (DEVTOOLS):** Genera automáticamente código repetitivo (getters, setters, constructores, etc.) mediante anotaciones, simplificando el mantenimiento del código.
+
+- **3) Spring Boot DevTools (DEVTOOLS):** Ofrece reinicio automático de la aplicación, depuración mejorada y herramientas como LiveReload para facilitar el desarrollo.
+
+- **4) Spring Web (WEB):** Permite desarrollar aplicaciones web y servicios RESTful con soporte para controladores, plantillas y manejo de rutas HTTP.
+
+- **5) Rest Repositories (WEB):** Expone repositorios de Spring Data como servicios RESTful automáticamente, permitiendo operaciones CRUD sin escribir controladores adicionales.
+
+- **6) Pruebas TDD (TESTING):** Framework de pruebas unitarias flexible y modular, con soporte para pruebas aisladas, parametrizadas, paralelas y extensiones.
+
+
+#### Dependencias Adicionales
+- **1) JUnit 5 (TESTING):** Framework de pruebas unitarias flexible y modular, con soporte para pruebas aisladas, parametrizadas, paralelas y extensiones.
+
+- **2) JaCoCo (TESTING):** Herramienta para análisis de cobertura de pruebas en Java, proporcionando informes detallados sobre qué partes del código han sido cubiertas durante las pruebas.
+
+
+
+## Base de Datos: MongoDB
+
+#### Credenciales Usuario
+- **Usuario:** dev
+- **Contraseña:** dev123
+
+
+#### Conexión desde Backend
+Configurado desde `application.properties` que se encuentra en `/src/main/resources/` del proyecto. El String de Conexión desde Java a la DB es:
+
+```str
+mongodb+srv://dev:dev123@dev.okcw6.mongodb.net/Dev?retryWrites=true&w=majority
+```
 
 
 ## Instalación
@@ -71,6 +110,26 @@ Este repositorio contiene un microservicio backend en **Java con Spring Boot**, 
 4. La aplicación estará corriendo en http://localhost:8080 por defecto.
 
 5. La documentación **Swagger** está disponible haciendo [Clic Aquí]()
+
+
+## Glosario de Comandos
+
+| **Comando**                      | **Descripción**                                                                                           |
+|-----------------------------------|-----------------------------------------------------------------------------------------------------------|
+| `mvn spring-boot:run`             | Ejecuta la aplicación Spring Boot.                                                                         |
+| `mvn clean`                       | Limpia el proyecto eliminando archivos generados anteriormente.                                            |
+| `mvn compile`                     | Compila el código fuente del proyecto.                                                                     |
+| `mvn package`                     | Compila y empaqueta el proyecto generando el archivo JAR o WAR en el directorio `target`.                  |
+| `mvn clean package`               | Limpia el proyecto, lo compila y empaqueta en un solo paso.                                                |
+| `mvn install`                     | Descarga las dependencias y las instala en el repositorio local. También genera el artefacto del proyecto.  |
+| `mvn verify`                      | Ejecuta las pruebas y verifica si el proyecto está listo para ser desplegado.                             |
+| `mvn test`                        | Ejecuta las pruebas unitarias definidas en el proyecto.                                                   |
+| `mvn clean install -U`            | Limpia el proyecto, descarga dependencias y actualiza todas a las versiones más recientes.                 |
+| `mvn dependency:tree`             | Muestra el árbol de dependencias del proyecto.                                                            |
+| `mvn jacoco:report`               | Genera un informe de cobertura de pruebas si estás utilizando JaCoCo.                                      |
+| `mvn dependency:resolve`          | Muestra todas las dependencias que se resuelven en el proyecto.                                           |
+
+
 
 ## Configuración del entorno
 Es posible configurar las variables en el archivo `application.properties`:
