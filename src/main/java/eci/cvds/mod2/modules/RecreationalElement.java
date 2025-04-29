@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RecreationalElements {
+public class RecreationalElement {
     @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     String id;

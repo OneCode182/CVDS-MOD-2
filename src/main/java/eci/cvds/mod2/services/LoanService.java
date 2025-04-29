@@ -4,9 +4,10 @@ import eci.cvds.mod2.modules.Loan;
 import eci.cvds.mod2.reposistories.LoanRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-@Repository
+@Service
 public class LoanService {
     private LoanRepo loanRepo;
     @Autowired

@@ -1,6 +1,6 @@
 package eci.cvds.mod2.services;
 
-import eci.cvds.mod2.modules.RecreationalElements;
+import eci.cvds.mod2.modules.RecreationalElement;
 import eci.cvds.mod2.reposistories.ElementsRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,23 +13,23 @@ public class ElementsService {
         this.elementsRepo = elementsRepo;
     }
 
-    public RecreationalElements getElementById(String elementId) {
+    public RecreationalElement getElementById(String elementId) {
         return null;
     }
 
-    public RecreationalElements getElementByName(String elementName) {
+    public RecreationalElement getElementByName(String elementName) {
         return null;
     }
 
-    public RecreationalElements createElement(RecreationalElements element) {
+    public RecreationalElement createElement(RecreationalElement element) {
         return null;
     }
 
-    public RecreationalElements deleteElement(String elementID) {
+    public RecreationalElement deleteElement(String elementID) {
         return null;
     }
 
-    public RecreationalElements updateElement(RecreationalElements element, RecreationalElements newElement) {
+    public RecreationalElement updateElement(RecreationalElement element, RecreationalElement newElement) {
         return null;
     }
 }

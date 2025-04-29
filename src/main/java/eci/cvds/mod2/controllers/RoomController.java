@@ -1,20 +1,24 @@
-package eci.cvds.mod2.services;
+package eci.cvds.mod2.controllers;
 
 import eci.cvds.mod2.modules.Room;
-import eci.cvds.mod2.reposistories.RoomRepo;
+import eci.cvds.mod2.services.RoomsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Service
-public class RoomsService {
-    private RoomRepo roomRepo;
-    @Autowired
-    public RoomsService(RoomRepo roomRepo){
-        this.roomRepo=roomRepo;
-    }
+@RestController
+@RequestMapping("/rooms")
+@CrossOrigin(origins = "*")
+public class RoomController {
 
+    RoomsService roomsService;
+    @Autowired
+    public RoomController(RoomsService roomsService){
+        this.roomsService = roomsService;
+    }
     public Room getRoomById(String roomId) {
         return null;
     }
