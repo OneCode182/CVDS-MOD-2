@@ -3,10 +3,10 @@ package eci.cvds.mod2.controllers;
 import eci.cvds.mod2.modules.RecreationalElement;
 import eci.cvds.mod2.services.ElementsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/elements")
@@ -18,23 +18,29 @@ public class ElementsController {
     public ElementsController(ElementsService elementsService){
         this.elementsService=elementsService;
     }
-    public ResponseEntity<RecreationalElement> getElementById(String elementId) {
-        return null;
+    @GetMapping("/id/{elementId}")
+    public ResponseEntity<RecreationalElement> getElementById(@PathVariable  String elementId) {
+        RecreationalElement element = elementsService.getElementById(elementId);
+        return ResponseEntity.ok(element);
     }
-
-    public ResponseEntity<RecreationalElement> getElementByName(String elementName) {
-        return null;
+    @GetMapping("/name/{elementName}")
+    public ResponseEntity<RecreationalElement> getElementByName(@PathVariable String elementName) {
+        RecreationalElement element = elementsService.getElementByName(elementName);
+        return ResponseEntity.ok(element);
     }
-
-    public ResponseEntity<RecreationalElement> createElement(RecreationalElement element) {
-        return null;
+    @PostMapping
+    public ResponseEntity<String> createElement(@RequestBody RecreationalElement element) {
+        elementsService.createElement(element);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Element successfully created");
     }
-
-    public ResponseEntity<RecreationalElement> deleteElement(String elementID) {
-        return null;
+    @DeleteMapping("/{elementId}")
+    public ResponseEntity<String> deleteElement(@PathVariable String elementId) {
+        elementsService.deleteElement(elementId);
+        return ResponseEntity.ok("Element successfully deleted ");
     }
-
-    public ResponseEntity<RecreationalElement> updateElement(RecreationalElement element, RecreationalElement newElement) {
-        return null;
+    @PutMapping("/{elementId}")
+    public ResponseEntity<String> updateElement(@PathVariable String elementId,@RequestBody RecreationalElement newElement){
+        elementsService.updateElement(elementId, newElement);
+        return ResponseEntity.ok("Element successfully updated");
     }
 }

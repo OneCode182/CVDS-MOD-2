@@ -45,11 +45,11 @@ public class ReservationService {
         return null;
     }
 
-    public Reservation updateReservation(Reservation rev, Reservation newRev) {
+    public Reservation updateReservation(String rev, Reservation newRev) {
         return null;
     }
 
-    public Reservation deleteReservation(Reservation rev) {
+    public Reservation deleteReservation(String revId) {
         return null;
     }
 

@@ -3,9 +3,9 @@ package eci.cvds.mod2.controllers;
 import eci.cvds.mod2.modules.Room;
 import eci.cvds.mod2.services.RoomsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -14,36 +14,52 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class RoomController {
 
-    RoomsService roomsService;
+    private final RoomsService roomsService;
+
     @Autowired
-    public RoomController(RoomsService roomsService){
+    public RoomController(RoomsService roomsService) {
         this.roomsService = roomsService;
     }
-    public Room getRoomById(String roomId) {
-        return null;
+
+    @GetMapping("/id/{roomId}")
+    public ResponseEntity<Room> getRoomById(@PathVariable String roomId) {
+        Room room = roomsService.getRoomById(roomId);
+        return ResponseEntity.ok(room);
     }
 
-    public List<Room> getRoomsByBuilding(char building) {
-        return null;
+    @GetMapping("/building/{building}")
+    public List<Room> getRoomsByBuilding(@PathVariable char building) {
+        return roomsService.getRoomsByBuilding(building);
     }
 
-    public List<Room> getRoomByCapacity(int capacity) {
-        return null;
+    @GetMapping("/capacity/{capacity}")
+    public ResponseEntity<List<Room>> getRoomByCapacity(@PathVariable int capacity) {
+        List<Room> rooms = roomsService.getRoomByCapacity(capacity);
+        return ResponseEntity.ok(rooms);
     }
 
-    public Room createRoom(Room room) {
-        return null;
+    @PostMapping
+    public ResponseEntity<Room> createRoom(@RequestBody Room room) {
+        Room created = roomsService.createRoom(room);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    public Room deleteRoom(Room room) {
-        return null;
+    @DeleteMapping("/{roomId}")
+    public ResponseEntity<String> deleteRoom(@PathVariable String roomId) {
+        roomsService.deleteRoom(roomId);
+        return ResponseEntity.ok("Room successfully deleted");
     }
 
-    public Room updateRoom(Room room, Room newRoom) {
-        return null;
+    @PutMapping("/{roomId}")
+    public ResponseEntity<Room> updateRoom(@PathVariable String roomId, @RequestBody Room newRoom) {
+        Room updated = roomsService.updateRoom(roomId, newRoom);
+        return ResponseEntity.ok(updated);
     }
 
-    public List<Room> getAll() {
-        return null;
+    @GetMapping
+    public ResponseEntity<List<Room>> getAll() {
+        List<Room> rooms = roomsService.getAll();
+        return ResponseEntity.ok(rooms);
     }
 }
+
