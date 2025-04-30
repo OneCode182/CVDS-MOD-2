@@ -31,11 +31,11 @@ public class RoomsService {
         return null;
     }
 
-    public Room deleteRoom(Room room) {
+    public Room deleteRoom(String roomId) {
         return null;
     }
 
-    public Room updateRoom(Room room, Room newRoom) {
+    public Room updateRoom(String roomId, Room newRoom) {
         return null;
     }
 

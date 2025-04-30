@@ -2,6 +2,8 @@ package eci.cvds.mod2.services;
 
 import eci.cvds.mod2.modules.Loan;
 import eci.cvds.mod2.reposistories.LoanRepo;
+import eci.cvds.mod2.util.State;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
@@ -20,7 +22,7 @@ public class LoanService {
         return null;
     }
 
-    public List<Loan> getLoansByState(boolean state) {
+    public List<Loan> getLoansByState(State state) {
         return null;
     }
 
@@ -28,7 +30,7 @@ public class LoanService {
         return null;
     }
 
-    public Loan updtateLoan(Loan loan, Loan newLoan) {
+    public Loan updtateLoan(String loanId, Loan newLoan) {
         return null;
     }
 

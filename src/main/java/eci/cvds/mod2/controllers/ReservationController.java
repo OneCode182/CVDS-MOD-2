@@ -5,10 +5,9 @@ import eci.cvds.mod2.services.ReservationService;
 import eci.cvds.mod2.util.Date;
 import eci.cvds.mod2.util.Role;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,48 +15,63 @@ import java.util.List;
 @RequestMapping("/revs")
 @CrossOrigin(origins = "*")
 public class ReservationController {
-    ReservationService reservationService;
+
+    private final ReservationService reservationService;
+
     @Autowired
-    public ReservationController(ReservationService reservationService){
+    public ReservationController(ReservationService reservationService) {
         this.reservationService = reservationService;
     }
-    public List<Reservation> getReservationsByUserId(String userId) {
-        return null;
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Reservation>> getReservationsByUserId(@PathVariable String userId) {
+        return ResponseEntity.ok(reservationService.getReservationsByUserId(userId));
     }
 
-    public List<Reservation> getReservationsByUserRole(Role role) {
-        return null;
+    @GetMapping("/role/{role}")
+    public List<Reservation> getReservationsByUserRole(@PathVariable Role role) {
+        return reservationService.getReservationsByUserRole(role);
     }
 
-    public ResponseEntity<Reservation> getReservationById(String revId) {
-        return null;
+    @GetMapping("/id/{revId}")
+    public ResponseEntity<Reservation> getReservationById(@PathVariable String revId) {
+        return ResponseEntity.ok(reservationService.getReservationById(revId));
     }
 
-    public List<Reservation> getReservationsByDay(Date date) {
-        return null;
+    @GetMapping("/date")
+    public ResponseEntity<List<Reservation>> getReservationsByDay(@RequestBody Date date) {
+        return ResponseEntity.ok(reservationService.getReservationsByDay(date));
     }
 
-    public List<Reservation> getReservationsByRoom(String roomId) {
-        return null;
+    @GetMapping("/room/{roomId}")
+    public List<Reservation> getReservationsByRoom(@PathVariable String roomId) {
+        return reservationService.getReservationsByRoom(roomId);
     }
 
-    public List<Reservation> getReservationsByState(boolean state) {
-        return null;
+    @GetMapping("/state/{state}")
+    public List<Reservation> getReservationsByState(@PathVariable boolean state) {
+        return reservationService.getReservationsByState(state);
     }
 
-    public ResponseEntity<Reservation> createReservation(Reservation rev) {
-        return null;
+    @PostMapping
+    public ResponseEntity<Reservation> createReservation(@RequestBody Reservation rev) {
+        Reservation created = reservationService.createReservation(rev);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    public ResponseEntity<Reservation> updateReservation(Reservation rev, Reservation newRev) {
-        return null;
+    @PutMapping("/{revId}")
+    public ResponseEntity<String> updateReservation(@PathVariable String revId, @RequestBody Reservation newRev) {
+        reservationService.updateReservation(revId, newRev);
+        return ResponseEntity.ok("Reservation successfully updated");
     }
 
-    public ResponseEntity<Reservation> deleteReservation(Reservation rev) {
-        return null;
+    @DeleteMapping("/{revId}")
+    public ResponseEntity<String> deleteReservation(@PathVariable String revId) {
+        reservationService.deleteReservation(revId);
+        return ResponseEntity.ok("Reservation successfully deleted");
     }
-
+    @GetMapping
     public List<Reservation> getAll() {
-        return null;
+        return reservationService.getAll();
     }
 }

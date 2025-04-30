@@ -1,7 +1,8 @@
 package eci.cvds.mod2.modules;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import eci.cvds.mod2.util.States;
+
+import eci.cvds.mod2.util.State;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,5 +21,5 @@ public class Loan {
     @Setter
     String elementId;
     @Setter
-    States state;
+    State state;
 }

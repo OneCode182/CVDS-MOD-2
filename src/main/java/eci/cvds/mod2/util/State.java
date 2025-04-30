@@ -1,0 +1,10 @@
+package eci.cvds.mod2.util;
+
+public enum State {
+    RESERVA_CONFIRMADA,
+    RESERVA_CANCELADA,
+    RESERVA_TERMINADA,
+    PRESTAMO_DEVUELTO,
+    PRESTAMO_PENDIENTE
+}
+

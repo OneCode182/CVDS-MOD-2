@@ -3,7 +3,7 @@ package eci.cvds.mod2.modules;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eci.cvds.mod2.util.Date;
 import eci.cvds.mod2.util.Role;
-import eci.cvds.mod2.util.States;
+import eci.cvds.mod2.util.State;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,7 +43,7 @@ public class Reservation {
     private Set<String> recreationalElements = new HashSet<>();
 
     @Setter
-    private States state;
+    private State state;
 
     @Setter
     private int people;

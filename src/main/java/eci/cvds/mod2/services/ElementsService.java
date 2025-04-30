@@ -25,11 +25,11 @@ public class ElementsService {
         return null;
     }
 
-    public RecreationalElement deleteElement(String elementID) {
+    public RecreationalElement deleteElement(String elementId) {
         return null;
     }
 
-    public RecreationalElement updateElement(RecreationalElement element, RecreationalElement newElement) {
+    public RecreationalElement updateElement(String elementId, RecreationalElement newElement) {
         return null;
     }
 }
