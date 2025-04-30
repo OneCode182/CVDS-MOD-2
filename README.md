@@ -156,19 +156,35 @@ mongodb+srv://dev:Ha9ky3DYQj1LmbUs@dev.spbbdmr.mongodb.net/
     * [Swagger URL](https://app.swaggerhub.com/apis-docs/DIEGOSP778/modulo-prestamos_api/1.0#/)
 
 ## Endpoints
+
 Este microservicio expone varios endpoints RESTful. A continuación, algunos ejemplos de los endpoints disponibles:
 
-| Method | Endpoint                     | Description                                         |
-|--------|------------------------------|-----------------------------------------------------|
-| GET   | `/api/health`                 | Endpoint por defecto para ver funcionamiento                                  |
-| GET    | `/prestamos`                 | Retrieve all loans                                  |
-| GET    | `/prestamos-prestados`       | Retrieve loans with status `Prestado`              |
-| GET    | `/prestamos/{id}`            | Retrieve loan details by ID                        |
-| GET    | `/prestamos/libro/{isbn}`    | Retrieve loans by book ISBN                        |
-| GET    | `/prestamos/estudiante/{id}` | Retrieve loans by student ID                      |
-| DELETE | `/prestamos/{id}/delete`         | Delete a loan (if conditions are met)              |
+| Método | Endpoint                              | Descripción                                                                  |
+|--------|---------------------------------------|------------------------------------------------------------------------------|
+| GET    | `/api/health`                         | Endpoint por defecto para verificar el estado de funcionamiento del servicio |
+| GET    | `/salas`                              | Obtener todas las salas disponibles y sus detalles                           |
+| GET    | `/salas/{id}`                         | Obtener los detalles de una sala específica por ID                           |
+| GET    | `/salas/disponibilidad`               | Obtener la disponibilidad de todas las salas en tiempo real                  |
+| GET    | `/salas/{id}/reservas`                | Obtener todas las reservas de una sala específica                           |
+| GET    | `/elementos`                          | Obtener todos los elementos recreativos disponibles                         |
+| GET    | `/elementos/{id}`                     | Obtener los detalles de un elemento recreativo específico por ID             |
+| GET    | `/elementos/{id}/disponibilidad`      | Consultar la disponibilidad de un elemento recreativo específico             |
+| POST   | `/reservas`                           | Crear una nueva reserva para una sala o elemento recreativo                  |
+| POST   | `/reservas/{id}/cancelar`             | Cancelar una reserva específica por ID                                        |
+| PUT    | `/reservas/{id}`                      | Actualizar una reserva existente (por ejemplo, cambiar hora o sala/elemento) |
+| DELETE | `/reservas/{id}`                      | Eliminar una reserva (si se cumplen las condiciones)                         |
+| GET    | `/reservas/usuario/{id}`              | Obtener todas las reservas de un usuario específico por ID                   |
+| GET    | `/reservas/elemento/{id}`             | Obtener reservas por el ID de un elemento recreativo específico              |
+| GET    | `/prestamos`                          | Obtener todos los préstamos de elementos recreativos                        |
+| GET    | `/prestamos/{id}`                     | Obtener los detalles de un préstamo por ID                                    |
+| POST   | `/prestamos`                          | Crear un nuevo préstamo de un elemento recreativo                            |
+| PUT    | `/prestamos/{id}`                     | Actualizar los detalles del préstamo (por ejemplo, fecha de devolución, estado del elemento) |
+| DELETE | `/prestamos/{id}`                     | Eliminar un registro de préstamo (si se cumplen las condiciones)             |
+| GET    | `/prestamos/usuario/{id}`             | Obtener todos los préstamos de un usuario específico                         |
+| GET    | `/prestamos/elemento/{id}`            | Obtener todos los préstamos de un elemento recreativo específico             |
 
-  ***NOTA:*** *Los enpoints en formato **Swagger** están disponibles [Aqui]()*
+
+***NOTA:*** *Los enpoints en formato **Swagger** están disponibles [Aqui]()*
 
 
 ### Configuraciones Adicionales
