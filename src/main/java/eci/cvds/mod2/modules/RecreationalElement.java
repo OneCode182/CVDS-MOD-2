@@ -20,6 +20,6 @@ public class RecreationalElement {
     String name;
     @Setter
     int quantity;
-    @Setter
+    @Settergit 
     String description;
 }

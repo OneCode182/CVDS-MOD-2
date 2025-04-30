@@ -101,6 +101,28 @@
 			<artifactId>swagger-annotations</artifactId>
 			<version>1.6.14</version>
 		</dependency>
+        <dependency>
+            <groupId>org.tukaani</groupId>
+            <artifactId>xz</artifactId>
+            <version>1.9</version>
+            <scope>test</scope>
+        </dependency>
+		<!-- Mockito Core -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>5.14.2</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Mockito JUnit Jupiter -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<version>5.14.2</version>
+			<scope>test</scope>
+		</dependency>
+
 
 
 	</dependencies>
