@@ -42,7 +42,7 @@ Este repositorio contiene un microservicio backend en **Java con Spring Boot**, 
 - **Diagramas:** Astah y [Miro](https://miro.com/es/)
 
 
-## Scaffolding
+## Estructura del Proyecto - Scaffolding
 
 #### Parámetros
 ```yml
@@ -65,13 +65,13 @@ Paquete: eci.cvds.mod2
 
 - **5) Rest Repositories (WEB):** Expone repositorios de Spring Data como servicios RESTful automáticamente, permitiendo operaciones CRUD sin escribir controladores adicionales.
 
-- **6) Pruebas TDD (TESTING):** Framework de pruebas unitarias flexible y modular, con soporte para pruebas aisladas, parametrizadas, paralelas y extensiones.
-
 
 #### Dependencias Adicionales
 - **1) JUnit 5 (TESTING):** Framework de pruebas unitarias flexible y modular, con soporte para pruebas aisladas, parametrizadas, paralelas y extensiones.
 
 - **2) JaCoCo (TESTING):** Herramienta para análisis de cobertura de pruebas en Java, proporcionando informes detallados sobre qué partes del código han sido cubiertas durante las pruebas.
+
+- **3) Swagger OpenAPI (DOCS):** Para documentar la API de este proyecto, se utiliza **Swagger** a través de la biblioteca **springdoc-openapi**. Esto permite generar y visualizar la documentación de los endpoints de la API de forma interactiva.
 
 
 
@@ -79,16 +79,24 @@ Paquete: eci.cvds.mod2
 
 #### Credenciales Usuario
 - **Usuario:** dev
-- **Contraseña:** dev123
+- **Contraseña:** Ha9ky3DYQj1LmbUs
 
 
 #### Conexión desde Backend
-Configurado desde `application.properties` que se encuentra en `/src/main/resources/` del proyecto. El String de Conexión desde Java a la DB es:
+Desde el `application.properties` que se encuentra en `/src/main/resources/` del proyecto, el String de Conexión es:
 
-```str
-mongodb+srv://dev:dev123@dev.okcw6.mongodb.net/Dev?retryWrites=true&w=majority
+
+```properties
+# String de Conexion Java
+spring.data.mongodb.uri=mongodb+srv://dev:Ha9ky3DYQj1LmbUs@dev.spbbdmr.mongodb.net/Dev?retryWrites=true&w=majority
+spring.data.mongodb.database=Dev
 ```
 
+Para conectarse desde un cliente gráfico como `MongoDB Compass`:
+```properties
+# String de Conexion Cliente
+mongodb+srv://dev:Ha9ky3DYQj1LmbUs@dev.spbbdmr.mongodb.net/
+```
 
 ## Instalación
 1. Clonar este repositorio:
@@ -131,45 +139,52 @@ mongodb+srv://dev:dev123@dev.okcw6.mongodb.net/Dev?retryWrites=true&w=majority
 
 
 
-## Configuración del entorno
-Es posible configurar las variables en el archivo `application.properties`:
-
-- `server.port`: Puerto en el que se ejecuta la aplicación.
-
-- `spring.datasource.url`: URL de conexión a la base de datos.
-
-- `spring.datasource.username`: Nombre de usuario de la base de datos.
-
-- `spring.datasource.password`: Contraseña de la base de datos.
-
 ## Novedades
-- **Loan Management**: Create, update, and delete book loans.
+- **Estructura:** Definir la estructura (Scaffolding) del proyecto, dependencias y codigo base.
 
-- **Fine Calculation**: Automatically calculates fines for overdue books.
+- **Dominio:** Desarrollo de las entidades base para el modulo y el API.
   
-- **Status Tracking**: Tracks loans by their status (`Prestado`, `Vencido`, `Devuelto`).
+- **Despliegue e Integración:** Configuracion en Azure en el Tema de Despliegue y vinculación con el repo mediante GitHub Actions.
 
-- **API Documentation**: Fully documented endpoints using Swagger/OpenAPI.
+- **Reglas de GitHub:** Al aprovar PR de ramas `feature` o `fix` etc, y luego de hacer merge, se borran de manera automatica. Además se protege a main y a dev para que no se eliminen por esta regla o por usuario.
+
+- **Documentación Endpoints API RESTful:** Documentacion con Swagger/OpenAPI funcional.
 
 
 
-1. Access the API documentation:
+- **Access the API documentation:**
     * [Swagger URL](https://app.swaggerhub.com/apis-docs/DIEGOSP778/modulo-prestamos_api/1.0#/)
 
 ## Endpoints
+
 Este microservicio expone varios endpoints RESTful. A continuación, algunos ejemplos de los endpoints disponibles:
 
-| Method | Endpoint                     | Description                                         |
-|--------|------------------------------|-----------------------------------------------------|
-| POST   | `/prestamos`                 | Create a new loan                                   |
-| GET    | `/prestamos`                 | Retrieve all loans                                  |
-| GET    | `/prestamos-prestados`       | Retrieve loans with status `Prestado`              |
-| GET    | `/prestamos/{id}`            | Retrieve loan details by ID                        |
-| GET    | `/prestamos/libro/{isbn}`    | Retrieve loans by book ISBN                        |
-| GET    | `/prestamos/estudiante/{id}` | Retrieve loans by student ID                      |
-| DELETE | `/prestamos/{id}/delete`         | Delete a loan (if conditions are met)              |
+| Método | Endpoint                              | Descripción                                                                  |
+|--------|---------------------------------------|------------------------------------------------------------------------------|
+| GET    | `/api/health`                         | Endpoint por defecto para verificar el estado de funcionamiento del servicio |
+| GET    | `/salas`                              | Obtener todas las salas disponibles y sus detalles                           |
+| GET    | `/salas/{id}`                         | Obtener los detalles de una sala específica por ID                           |
+| GET    | `/salas/disponibilidad`               | Obtener la disponibilidad de todas las salas en tiempo real                  |
+| GET    | `/salas/{id}/reservas`                | Obtener todas las reservas de una sala específica                           |
+| GET    | `/elementos`                          | Obtener todos los elementos recreativos disponibles                         |
+| GET    | `/elementos/{id}`                     | Obtener los detalles de un elemento recreativo específico por ID             |
+| GET    | `/elementos/{id}/disponibilidad`      | Consultar la disponibilidad de un elemento recreativo específico             |
+| POST   | `/reservas`                           | Crear una nueva reserva para una sala o elemento recreativo                  |
+| POST   | `/reservas/{id}/cancelar`             | Cancelar una reserva específica por ID                                        |
+| PUT    | `/reservas/{id}`                      | Actualizar una reserva existente (por ejemplo, cambiar hora o sala/elemento) |
+| DELETE | `/reservas/{id}`                      | Eliminar una reserva (si se cumplen las condiciones)                         |
+| GET    | `/reservas/usuario/{id}`              | Obtener todas las reservas de un usuario específico por ID                   |
+| GET    | `/reservas/elemento/{id}`             | Obtener reservas por el ID de un elemento recreativo específico              |
+| GET    | `/prestamos`                          | Obtener todos los préstamos de elementos recreativos                        |
+| GET    | `/prestamos/{id}`                     | Obtener los detalles de un préstamo por ID                                    |
+| POST   | `/prestamos`                          | Crear un nuevo préstamo de un elemento recreativo                            |
+| PUT    | `/prestamos/{id}`                     | Actualizar los detalles del préstamo (por ejemplo, fecha de devolución, estado del elemento) |
+| DELETE | `/prestamos/{id}`                     | Eliminar un registro de préstamo (si se cumplen las condiciones)             |
+| GET    | `/prestamos/usuario/{id}`             | Obtener todos los préstamos de un usuario específico                         |
+| GET    | `/prestamos/elemento/{id}`            | Obtener todos los préstamos de un elemento recreativo específico             |
 
-  ***NOTA:*** *Los enpoints en formato **Swagger** están disponibles [Aqui]()*
+
+***NOTA:*** *Los enpoints en formato **Swagger** están disponibles [Aqui]()*
 
 
 ### Configuraciones Adicionales
