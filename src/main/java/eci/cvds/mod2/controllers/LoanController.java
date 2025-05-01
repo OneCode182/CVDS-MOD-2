@@ -3,6 +3,7 @@ package eci.cvds.mod2.controllers;
 import eci.cvds.mod2.modules.Loan;
 import eci.cvds.mod2.services.LoanService;
 import eci.cvds.mod2.util.State;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +30,13 @@ public class LoanController {
         return loanService.getLoansByState(state);
     }
     @PostMapping
-    public ResponseEntity<String> createLoan(@RequestBody Loan loan) {
+    public ResponseEntity<String> createLoan(@Valid @RequestBody Loan loan) {
         loanService.createLoan(loan);
         return ResponseEntity.status(HttpStatus.CREATED).body("Loan successfully created");
     }
     @PutMapping("/{loanId}")
-    public ResponseEntity<String> updateLoan(@PathVariable String loanId, @RequestBody Loan newLoan) {
-        loanService.updtateLoan(loanId,newLoan);
+    public ResponseEntity<String> updateLoan(@PathVariable String loanId, @Valid @RequestBody Loan newLoan) {
+        loanService.updateLoan(loanId,newLoan);
         return ResponseEntity.ok("Loan successfully updated ");
     }
     @DeleteMapping("/{loanId}")

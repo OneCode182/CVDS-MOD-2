@@ -1,6 +1,9 @@
 package eci.cvds.mod2.modules;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,8 +20,10 @@ public class RecreationalElement {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     String id;
     @Setter
+    @NotBlank(message = "The name cannot be null")
     String name;
     @Setter
+    @Positive(message = "The quantity cannot be null")
     int quantity;
     @Setter
     String description;
