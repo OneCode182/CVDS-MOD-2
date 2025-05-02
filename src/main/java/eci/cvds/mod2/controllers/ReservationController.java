@@ -4,6 +4,7 @@ import eci.cvds.mod2.modules.Reservation;
 import eci.cvds.mod2.services.ReservationService;
 import eci.cvds.mod2.util.Date;
 import eci.cvds.mod2.util.Role;
+import eci.cvds.mod2.util.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +30,8 @@ public class ReservationController {
     }
 
     @GetMapping("/role/{role}")
-    public List<Reservation> getReservationsByUserRole(@PathVariable Role role) {
-        return reservationService.getReservationsByUserRole(role);
+    public ResponseEntity<List<Reservation>> getReservationsByUserRole(@PathVariable Role role) {
+        return ResponseEntity.ok(reservationService.getReservationsByUserRole(role));
     }
 
     @GetMapping("/id/{revId}")
@@ -38,14 +39,14 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.getReservationById(revId));
     }
 
-    @GetMapping("/date")
+    @PostMapping("/date")
     public ResponseEntity<List<Reservation>> getReservationsByDay(@RequestBody Date date) {
         return ResponseEntity.ok(reservationService.getReservationsByDay(date));
     }
 
     @GetMapping("/room/{roomId}")
-    public List<Reservation> getReservationsByRoom(@PathVariable String roomId) {
-        return reservationService.getReservationsByRoom(roomId);
+    public ResponseEntity<List<Reservation>> getReservationsByRoom(@PathVariable String roomId) {
+        return ResponseEntity.ok(reservationService.getReservationsByRoom(roomId));
     }
 
     @GetMapping("/state/{state}")
@@ -60,18 +61,27 @@ public class ReservationController {
     }
 
     @PutMapping("/{revId}")
-    public ResponseEntity<String> updateReservation(@PathVariable String revId, @RequestBody Reservation newRev) {
-        reservationService.updateReservation(revId, newRev);
-        return ResponseEntity.ok("Reservation successfully updated");
+    public ResponseEntity<Reservation> updateReservation(@PathVariable String revId, @RequestBody Reservation newRev) {
+        Reservation updated = reservationService.updateReservation(revId, newRev);
+        if (updated != null) {
+            return ResponseEntity.ok(updated);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{revId}")
     public ResponseEntity<String> deleteReservation(@PathVariable String revId) {
-        reservationService.deleteReservation(revId);
-        return ResponseEntity.ok("Reservation successfully deleted");
+        Reservation deleted = reservationService.deleteReservation(revId);
+        if (deleted != null) {
+            return ResponseEntity.ok("Reservation successfully deleted");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
+
     @GetMapping
-    public List<Reservation> getAll() {
-        return reservationService.getAll();
+    public ResponseEntity<List<Reservation>> getAll() {
+        return ResponseEntity.ok(reservationService.getAll());
     }
 }
