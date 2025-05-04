@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "API de Salud", description = "Operaciones para verificar el estado de la API")
 public class ApiController {
 
-    // Endpoint GET para verificar si la API funciona
     @GetMapping("/health")
     @Operation(summary = "Verifica el estado de la API", description = "Este endpoint devuelve un mensaje indicando que la API está funcionando correctamente.")
     public String checkHealth() {

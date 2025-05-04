@@ -9,40 +9,50 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/loans")
 @CrossOrigin(origins = "*")
 public class LoanController {
+
     LoanService loanService;
+
     @Autowired
-    public LoanController(LoanService loanService){
-        this.loanService=loanService;
+    public LoanController(LoanService loanService) {
+        this.loanService = loanService;
     }
+
     @GetMapping("/id/{loanId}")
     public ResponseEntity<Loan> getLoanById(@PathVariable String loanId) {
-        Loan loan = loanService.getLoanById(loanId);
-        return ResponseEntity.ok(loan);
+        Optional<Loan> loanOptional = loanService.getLoanById(loanId);
+        if (loanOptional.isPresent()) {
+            return ResponseEntity.ok(loanOptional.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
+
     @GetMapping("/state/{state}")
     public List<Loan> getLoansByState(@PathVariable State state) {
         return loanService.getLoansByState(state);
     }
+
     @PostMapping
     public ResponseEntity<String> createLoan(@RequestBody Loan loan) {
         loanService.createLoan(loan);
         return ResponseEntity.status(HttpStatus.CREATED).body("Loan successfully created");
     }
+
     @PutMapping("/{loanId}")
     public ResponseEntity<String> updateLoan(@PathVariable String loanId, @RequestBody Loan newLoan) {
-        loanService.updtateLoan(loanId,newLoan);
+        loanService.updateLoan(loanId, newLoan);
         return ResponseEntity.ok("Loan successfully updated ");
     }
+
     @DeleteMapping("/{loanId}")
     public ResponseEntity<String> deleteLoan(@PathVariable String loanId) {
         loanService.deleteLoan(loanId);
         return ResponseEntity.ok("Loan successfully deleted");
     }
-
-
 }

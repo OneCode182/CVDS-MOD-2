@@ -45,33 +45,26 @@ public class ReservationService {
         return reservationRepo.findByRoomId(roomId);
     }
 
-    // Aquí cambiamos el boolean por un State real del enum
     public List<Reservation> getReservationsByState(boolean stateBool) {
         State state = stateBool ? State.RESERVA_CONFIRMADA : State.RESERVA_CANCELADA;
         return reservationRepo.findByState(state);
     }
 
     public Reservation createReservation(Reservation rev) {
-        // Guarda la reserva
         Reservation createdReservation = reservationRepo.save(rev);
-
-        // Filtra reservas activas (confirmadas) para la misma sala
         List<Reservation> activeReservations = reservationRepo.findByRoomId(rev.getRoomId())
                 .stream()
                 .filter(r -> r.getState() == State.RESERVA_CONFIRMADA)
                 .toList();
 
-        // Suma total de personas actualmente en la sala
         int totalPeople = activeReservations.stream().mapToInt(Reservation::getPeople).sum();
 
-        // Busca y actualiza la sala
         Optional<Room> optionalRoom = roomRepo.findById(rev.getRoomId());
         if (optionalRoom.isPresent()) {
             Room room = optionalRoom.get();
             room.setCurrentPeople(totalPeople);
             roomRepo.save(room);
         }
-
         return createdReservation;
     }
 
@@ -92,6 +85,13 @@ public class ReservationService {
         }
         return null;
     }
+
+    public List<Room> getAvailableRooms(int requiredPeople) {
+        return roomRepo.findAll().stream()
+                .filter(room -> room.getCapacity() - room.getCurrentPeople() >= requiredPeople)
+                .toList();
+    }
+
 
     public List<Reservation> getAll() {
         return reservationRepo.findAll();

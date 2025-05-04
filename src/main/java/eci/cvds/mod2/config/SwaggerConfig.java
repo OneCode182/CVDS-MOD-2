@@ -1,6 +1,5 @@
 package eci.cvds.mod2.config;
 
-
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import org.springdoc.core.models.GroupedOpenApi;
@@ -20,8 +19,8 @@ public class SwaggerConfig {
     @Bean
     public GroupedOpenApi apiDocs() {
         return GroupedOpenApi.builder()
-             .group("v1") // Nombre de la versión o del grupo de documentación
-             .pathsToMatch("/api/**") // Rutas que se incluirán en la documentación
+             .group("v1")
+             .pathsToMatch("/api/**")
              .build();
     }
 
