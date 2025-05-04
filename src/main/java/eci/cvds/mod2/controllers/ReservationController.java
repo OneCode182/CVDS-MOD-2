@@ -4,12 +4,15 @@ import eci.cvds.mod2.modules.Reservation;
 import eci.cvds.mod2.services.ReservationService;
 import eci.cvds.mod2.util.Date;
 import eci.cvds.mod2.util.Role;
+import eci.cvds.mod2.util.State;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/revs")
@@ -24,8 +27,8 @@ public class ReservationController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Reservation>> getReservationsByUserId(@PathVariable String userId) {
-        return ResponseEntity.ok(reservationService.getReservationsByUserId(userId));
+    public List<Reservation> getReservationsByUserId(@PathVariable String userId) {
+        return reservationService.getReservationsByUserId(userId);
     }
 
     @GetMapping("/role/{role}")
@@ -35,12 +38,17 @@ public class ReservationController {
 
     @GetMapping("/id/{revId}")
     public ResponseEntity<Reservation> getReservationById(@PathVariable String revId) {
-        return ResponseEntity.ok(reservationService.getReservationById(revId));
+        Optional<Reservation> reservation = reservationService.getReservationById(revId);
+        if (reservation.isPresent()) {
+            return ResponseEntity.ok(reservation.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @GetMapping("/date")
-    public ResponseEntity<List<Reservation>> getReservationsByDay(@RequestBody Date date) {
-        return ResponseEntity.ok(reservationService.getReservationsByDay(date));
+    public List<Reservation> getReservationsByDay(@RequestBody Date date) {
+        return reservationService.getReservationsByDay(date);
     }
 
     @GetMapping("/room/{roomId}")
@@ -49,27 +57,41 @@ public class ReservationController {
     }
 
     @GetMapping("/state/{state}")
-    public List<Reservation> getReservationsByState(@PathVariable boolean state) {
+    public List<Reservation> getReservationsByState(@PathVariable State state) {
         return reservationService.getReservationsByState(state);
     }
 
     @PostMapping
     public ResponseEntity<Reservation> createReservation(@RequestBody Reservation rev) {
-        Reservation created = reservationService.createReservation(rev);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        Reservation newReservation = reservationService.createReservation(rev);
+        if (newReservation != null) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(newReservation);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @PutMapping("/{revId}")
-    public ResponseEntity<String> updateReservation(@PathVariable String revId, @RequestBody Reservation newRev) {
-        reservationService.updateReservation(revId, newRev);
-        return ResponseEntity.ok("Reservation successfully updated");
+    public ResponseEntity<Reservation> updateReservation(@PathVariable String revId, @RequestBody Reservation newRev) {
+        Reservation updatedReservation = reservationService.updateReservation(revId, newRev);
+        if (updatedReservation != null) {
+            return ResponseEntity.ok(updatedReservation);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
     }
 
     @DeleteMapping("/{revId}")
     public ResponseEntity<String> deleteReservation(@PathVariable String revId) {
-        reservationService.deleteReservation(revId);
-        return ResponseEntity.ok("Reservation successfully deleted");
+        boolean deleted = reservationService.deleteReservation(revId);
+        if (deleted) {
+            return ResponseEntity.ok().body("Reservation successfully deleted");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
+
     @GetMapping
     public List<Reservation> getAll() {
         return reservationService.getAll();

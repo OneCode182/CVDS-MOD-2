@@ -9,40 +9,63 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/loans")
 @CrossOrigin(origins = "*")
 public class LoanController {
     LoanService loanService;
+
     @Autowired
-    public LoanController(LoanService loanService){
-        this.loanService=loanService;
+    public LoanController(LoanService loanService) {
+        this.loanService = loanService;
     }
+
     @GetMapping("/id/{loanId}")
     public ResponseEntity<Loan> getLoanById(@PathVariable String loanId) {
-        Loan loan = loanService.getLoanById(loanId);
-        return ResponseEntity.ok(loan);
+        Optional<Loan> loan = loanService.getLoanById(loanId);
+        if (loan.isPresent()) {
+            return ResponseEntity.ok(loan.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
+
     @GetMapping("/state/{state}")
     public List<Loan> getLoansByState(@PathVariable State state) {
         return loanService.getLoansByState(state);
     }
+
     @PostMapping
-    public ResponseEntity<String> createLoan(@RequestBody Loan loan) {
-        loanService.createLoan(loan);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Loan successfully created");
-    }
-    @PutMapping("/{loanId}")
-    public ResponseEntity<String> updateLoan(@PathVariable String loanId, @RequestBody Loan newLoan) {
-        loanService.updtateLoan(loanId,newLoan);
-        return ResponseEntity.ok("Loan successfully updated ");
-    }
-    @DeleteMapping("/{loanId}")
-    public ResponseEntity<String> deleteLoan(@PathVariable String loanId) {
-        loanService.deleteLoan(loanId);
-        return ResponseEntity.ok("Loan successfully deleted");
+    public ResponseEntity<Loan> createLoan(@RequestBody Loan loan) {
+        Loan newLoan = loanService.createLoan(loan);
+        if (newLoan != null) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(newLoan);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
+    @PutMapping("/{loanId}")
+    public ResponseEntity<Loan> updateLoan(@PathVariable String loanId, @RequestBody Loan newLoan) {
+        Loan updatedLoan = loanService.updateLoan(loanId, newLoan);
+        if (updatedLoan != null) {
+            return ResponseEntity.ok(updatedLoan);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
+    }
+
+    @DeleteMapping("/{loanId}")
+    public ResponseEntity<?> deleteLoan(@PathVariable String loanId) {
+        boolean deleted = loanService.deleteLoan(loanId);
+        if (deleted) {
+            return ResponseEntity.ok().body("Loan successfully deleted");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 
 }

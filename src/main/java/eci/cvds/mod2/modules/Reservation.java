@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import eci.cvds.mod2.util.Date;
 import eci.cvds.mod2.util.Role;
 import eci.cvds.mod2.util.State;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +14,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.*;
 
 @Getter
+@Setter
 @Document(collection = "reservations")
+@AllArgsConstructor
 @Builder
 public class Reservation {
 

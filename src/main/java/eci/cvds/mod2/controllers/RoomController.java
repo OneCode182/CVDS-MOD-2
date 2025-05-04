@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/rooms")
@@ -23,43 +24,58 @@ public class RoomController {
 
     @GetMapping("/id/{roomId}")
     public ResponseEntity<Room> getRoomById(@PathVariable String roomId) {
-        Room room = roomsService.getRoomById(roomId);
-        return ResponseEntity.ok(room);
+        Optional<Room> room = roomsService.getRoomById(roomId);
+        if (room.isPresent()) {
+            return ResponseEntity.ok(room.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @GetMapping("/building/{building}")
-    public List<Room> getRoomsByBuilding(@PathVariable char building) {
+    public List<Room> getRoomsByBuilding(@PathVariable String building) {
         return roomsService.getRoomsByBuilding(building);
     }
 
     @GetMapping("/capacity/{capacity}")
-    public ResponseEntity<List<Room>> getRoomByCapacity(@PathVariable int capacity) {
-        List<Room> rooms = roomsService.getRoomByCapacity(capacity);
-        return ResponseEntity.ok(rooms);
+    public List<Room> getRoomByCapacity(@PathVariable int capacity) {
+        return roomsService.getRoomByCapacity(capacity);
     }
 
     @PostMapping
     public ResponseEntity<Room> createRoom(@RequestBody Room room) {
-        Room created = roomsService.createRoom(room);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        Room newRoom = roomsService.createRoom(room);
+        if (newRoom != null) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(newRoom);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
     }
 
     @DeleteMapping("/{roomId}")
     public ResponseEntity<String> deleteRoom(@PathVariable String roomId) {
-        roomsService.deleteRoom(roomId);
-        return ResponseEntity.ok("Room successfully deleted");
+        boolean deleted = roomsService.deleteRoom(roomId);
+        if (deleted) {
+            return ResponseEntity.ok().body("Room successfully deleted");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @PutMapping("/{roomId}")
     public ResponseEntity<Room> updateRoom(@PathVariable String roomId, @RequestBody Room newRoom) {
-        Room updated = roomsService.updateRoom(roomId, newRoom);
-        return ResponseEntity.ok(updated);
+        Room updatedRoom = roomsService.updateRoom(roomId, newRoom);
+        if (updatedRoom != null) {
+            return ResponseEntity.ok(updatedRoom);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
     }
 
     @GetMapping
-    public ResponseEntity<List<Room>> getAll() {
-        List<Room> rooms = roomsService.getAll();
-        return ResponseEntity.ok(rooms);
+    public List<Room> getAll() {
+        return roomsService.getAll();
     }
 }
-
