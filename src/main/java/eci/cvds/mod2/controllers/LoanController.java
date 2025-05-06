@@ -15,6 +15,7 @@ import java.util.Optional;
 @RequestMapping("/loans")
 @CrossOrigin(origins = "*")
 public class LoanController {
+
     LoanService loanService;
 
     @Autowired
@@ -24,9 +25,10 @@ public class LoanController {
 
     @GetMapping("/id/{loanId}")
     public ResponseEntity<Loan> getLoanById(@PathVariable String loanId) {
-        Optional<Loan> loan = loanService.getLoanById(loanId);
-        if (loan.isPresent()) {
-            return ResponseEntity.ok(loan.get());
+        Optional<Loan> loanOptional = loanService.getLoanById(loanId);
+        if (loanOptional.isPresent()) {
+            return ResponseEntity.ok(loanOptional.get());
+
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }

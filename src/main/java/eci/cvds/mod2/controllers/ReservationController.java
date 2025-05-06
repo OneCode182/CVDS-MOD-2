@@ -32,8 +32,8 @@ public class ReservationController {
     }
 
     @GetMapping("/role/{role}")
-    public List<Reservation> getReservationsByUserRole(@PathVariable Role role) {
-        return reservationService.getReservationsByUserRole(role);
+    public ResponseEntity<List<Reservation>> getReservationsByUserRole(@PathVariable Role role) {
+        return ResponseEntity.ok(reservationService.getReservationsByUserRole(role));
     }
 
     @GetMapping("/id/{revId}")
@@ -46,14 +46,16 @@ public class ReservationController {
         }
     }
 
-    @GetMapping("/date")
-    public List<Reservation> getReservationsByDay(@RequestBody Date date) {
-        return reservationService.getReservationsByDay(date);
+
+
+    @PostMapping("/date")
+    public ResponseEntity<List<Reservation>> getReservationsByDay(@RequestBody Date date) {
+        return ResponseEntity.ok(reservationService.getReservationsByDay(date));
     }
 
     @GetMapping("/room/{roomId}")
-    public List<Reservation> getReservationsByRoom(@PathVariable String roomId) {
-        return reservationService.getReservationsByRoom(roomId);
+    public ResponseEntity<List<Reservation>> getReservationsByRoom(@PathVariable String roomId) {
+        return ResponseEntity.ok(reservationService.getReservationsByRoom(roomId));
     }
 
     @GetMapping("/state/{state}")
@@ -73,27 +75,27 @@ public class ReservationController {
 
     @PutMapping("/{revId}")
     public ResponseEntity<Reservation> updateReservation(@PathVariable String revId, @RequestBody Reservation newRev) {
-        Reservation updatedReservation = reservationService.updateReservation(revId, newRev);
-        if (updatedReservation != null) {
-            return ResponseEntity.ok(updatedReservation);
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
 
+        Reservation updated = reservationService.updateReservation(revId, newRev);
+        if (updated != null) {
+            return ResponseEntity.ok(updated);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{revId}")
     public ResponseEntity<String> deleteReservation(@PathVariable String revId) {
-        boolean deleted = reservationService.deleteReservation(revId);
-        if (deleted) {
-            return ResponseEntity.ok().body("Reservation successfully deleted");
+        Reservation deleted = reservationService.deleteReservation(revId);
+        if (deleted != null) {
+            return ResponseEntity.ok("Reservation successfully deleted");
         } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping
-    public List<Reservation> getAll() {
-        return reservationService.getAll();
+    public ResponseEntity<List<Reservation>> getAll() {
+        return ResponseEntity.ok(reservationService.getAll());
     }
 }

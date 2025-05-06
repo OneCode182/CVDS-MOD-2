@@ -3,7 +3,6 @@ package eci.cvds.mod2.services;
 import eci.cvds.mod2.modules.Loan;
 import eci.cvds.mod2.reposistories.LoanRepo;
 import eci.cvds.mod2.util.State;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +14,7 @@ public class LoanService {
     private LoanRepo loanRepo;
 
     @Autowired
+
     public LoanService(LoanRepo loanRepo) {
         this.loanRepo = loanRepo;
     }
@@ -24,7 +24,9 @@ public class LoanService {
     }
 
     public List<Loan> getLoansByState(State state) {
-        return loanRepo.findByState(state);
+        return loanRepo.findAll().stream()
+                .filter(loan -> loan.getState().equals(state))
+                .toList();
     }
 
     public Loan createLoan(Loan loan) {
@@ -35,20 +37,20 @@ public class LoanService {
             return null;
         }
     }
+  
+  public Loan updateLoan(String loanId, Loan newLoan) {
+        Optional<Loan> existingLoanOpt = loanRepo.findById(loanId);
+        if (existingLoanOpt.isPresent()) {
+            Loan existingLoan = existingLoanOpt.get();
+            existingLoan.setState(newLoan.getState());
+            existingLoan.setElementId(newLoan.getElementId());
 
-    public Loan updateLoan(String loanId, Loan loan) {
-        if (!loanRepo.existsById(loanId)) {
-            return null;
+            return loanRepo.save(existingLoan);
+        } else {
+            throw new RuntimeException("Loan not found");
         }
-        Loan updatedLoan = loanRepo.findById(loanId).orElse(null);
-        if (updatedLoan == null) {
-            return null;
-        }
-        updatedLoan.setElementId(loan.getElementId());
-        updatedLoan.setState(loan.getState());
-        return loanRepo.save(updatedLoan);
     }
-
+   
     public boolean deleteLoan(String loanId) {
         try {
             loanRepo.deleteById(loanId);
@@ -60,5 +62,20 @@ public class LoanService {
 
     public List<Loan> getAll() {
         return loanRepo.findAll();
+    }
+  
+    public List<Loan> getLoansByRoomId(String roomId) {
+        return loanRepo.findAll().stream()
+                .filter(loan -> loan.getReservation() != null &&
+                        loan.getReservation().getRoom() != null &&
+                        loan.getReservation().getRoom().getRoomId().equals(roomId))
+                .toList();
+    }
+
+    public List<Loan> getLoansWithDamagedElements() {
+        return loanRepo.findAll().stream()
+                .filter(loan -> loan.getState() == State.DAMAGED_ELEMENT)
+                .toList();
+
     }
 }
