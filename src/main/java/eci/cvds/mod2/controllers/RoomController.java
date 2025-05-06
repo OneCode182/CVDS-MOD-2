@@ -2,6 +2,7 @@ package eci.cvds.mod2.controllers;
 
 import eci.cvds.mod2.modules.Room;
 import eci.cvds.mod2.services.RoomsService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +40,7 @@ public class RoomController {
     }
 
     @PostMapping
-    public ResponseEntity<Room> createRoom(@RequestBody Room room) {
+    public ResponseEntity<Room> createRoom(@Valid @RequestBody Room room) {
         Room created = roomsService.createRoom(room);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -51,7 +52,7 @@ public class RoomController {
     }
 
     @PutMapping("/{roomId}")
-    public ResponseEntity<Room> updateRoom(@PathVariable String roomId, @RequestBody Room newRoom) {
+    public ResponseEntity<Room> updateRoom(@PathVariable String roomId, @Valid @RequestBody Room newRoom) {
         Room updated = roomsService.updateRoom(roomId, newRoom);
         return ResponseEntity.ok(updated);
     }
@@ -60,6 +61,16 @@ public class RoomController {
     public ResponseEntity<List<Room>> getAll() {
         List<Room> rooms = roomsService.getAll();
         return ResponseEntity.ok(rooms);
+    }
+    @PostMapping("/add/{roomId}/{elementId}")
+    public ResponseEntity<String> addElementToRoom(@PathVariable String roomId,@PathVariable String elementId){
+        roomsService.addElementToRoom(roomId,elementId);
+        return ResponseEntity.ok("Element added successfully");
+    }
+    @PostMapping("/remove/{roomId}/{elementId}")
+    public ResponseEntity<String> removeElementFromRoom(@PathVariable String roomId,@PathVariable String elementId){
+        roomsService.removeElementFromRoom(roomId,elementId);
+        return ResponseEntity.ok("Element removed successfully");
     }
 }
 

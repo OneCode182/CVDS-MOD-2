@@ -39,9 +39,6 @@ public class Reservation {
     @Builder.Default
     private Set<String> loans = new HashSet<>();
 
-    @Builder.Default
-    private Set<String> recreationalElements = new HashSet<>();
-
     @Setter
     private State state;
 
