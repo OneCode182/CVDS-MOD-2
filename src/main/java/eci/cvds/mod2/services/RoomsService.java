@@ -72,4 +72,16 @@ public class RoomsService {
     public List<Room> getAll() {
         return roomRepo.findAll();
     }
+    public void reduceCapacityOfRoom(String roomId){
+        Room room = roomRepo.findById(roomId)
+                .orElseThrow(()-> new RoomNotFoundException(RoomException.ROOM_NOT_FOUND));
+        room.reduceCapacity();
+        roomRepo.save(room);
+    }
+    public void increaseCapacityOfRoom(String roomId){
+        Room room = roomRepo.findById(roomId)
+                .orElseThrow(()-> new RoomNotFoundException(RoomException.ROOM_NOT_FOUND));
+        room.increaseCapacity();
+        roomRepo.save(room);
+    }
 }

@@ -1,5 +1,7 @@
 package eci.cvds.mod2.controllers;
 
+import eci.cvds.mod2.exceptions.RoomException;
+import eci.cvds.mod2.exceptions.RoomNotFoundException;
 import eci.cvds.mod2.modules.Room;
 import eci.cvds.mod2.services.RoomsService;
 import jakarta.validation.Valid;
@@ -12,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/rooms")
-@CrossOrigin(origins = "*")
+
 public class RoomController {
 
     private final RoomsService roomsService;
@@ -71,6 +73,16 @@ public class RoomController {
     public ResponseEntity<String> removeElementFromRoom(@PathVariable String roomId,@PathVariable String elementId){
         roomsService.removeElementFromRoom(roomId,elementId);
         return ResponseEntity.ok("Element removed successfully");
+    }
+    @PutMapping("/reduce/{roomId}")
+    public ResponseEntity<String> reduceCapacityOfRoom(@PathVariable String roomId){
+        roomsService.reduceCapacityOfRoom(roomId);
+        return ResponseEntity.ok("The capacity was successfully reduced");
+    }
+    @PutMapping("/increase/{roomId}")
+    public ResponseEntity<String> increaseCapacityOfRoom(@PathVariable String roomId){
+        roomsService.increaseCapacityOfRoom(roomId);
+        return ResponseEntity.ok("The capacity was successfully increased");
     }
 }
 

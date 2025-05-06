@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/elements")
-@CrossOrigin(origins = "*")
-
 public class ElementsController {
     ElementsService elementsService;
     @Autowired

@@ -1,69 +1,127 @@
 package eci.cvds.mod2.services;
 
+import eci.cvds.mod2.controllers.RoomController;
+import eci.cvds.mod2.exceptions.*;
 import eci.cvds.mod2.modules.Reservation;
+import eci.cvds.mod2.modules.Room;
 import eci.cvds.mod2.reposistories.ReservationRepo;
 import eci.cvds.mod2.util.Date;
-import eci.cvds.mod2.exceptions.ReservationException;
 import eci.cvds.mod2.util.Role;
+import eci.cvds.mod2.util.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Stack;
 
 @Service
 public class ReservationService {
     private final ReservationRepo reservationRepo;
+    private final RoomController roomController;
     @Autowired
-    public ReservationService(ReservationRepo reservationRepo){
+    public ReservationService(ReservationRepo reservationRepo, RoomController roomController){
         this.reservationRepo = reservationRepo;
+        this.roomController = roomController;
     }
 
     public List<Reservation> getReservationsByUserId(String userId) {
-        return reservationRepo.getReservationByUserId(userId);
+        List<Reservation> reservations = reservationRepo.findReservationByUserId(userId);
+        if (reservations.isEmpty()) {
+            throw new ReservationNotFoundException(ReservationException.USER_HAS_NO_RESERVATIONS);
+        }
+        return reservations;
     }
 
-    public List<Reservation> getReservationsByUserRole(Role role) {
 
+    public List<Reservation> getReservationsByUserRole(Role role) {
         return null;
     }
 
     public Reservation getReservationById(String revId) {
-        Optional<Reservation> optionalReservation = reservationRepo.findById(revId);
-        if(optionalReservation.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ReservationException.REV_NOT_FOUND);
-        }
-        return optionalReservation.get();
+        return reservationRepo.findById(revId).
+                orElseThrow(()-> new ReservationNotFoundException(ReservationException.REV_NOT_FOUND));
     }
 
     public List<Reservation> getReservationsByDay(Date date) {
-
-        return null;
+        List<Reservation> reservations = reservationRepo.findReservationByDate(date);
+        if (reservations.isEmpty()) {
+            throw new ReservationNotFoundException(ReservationException.NO_RESERVATIONS_ON_SPECIFIC_DAY);
+        }
+        return reservations;
     }
 
     public List<Reservation> getReservationsByRoom(String roomId) {
-        return null;
+        List<Reservation> reservations = reservationRepo.findReservationByRoomId(roomId);
+        if (reservations.isEmpty()) {
+            throw new ReservationNotFoundException(ReservationException.NO_RESERVATIONS_IN_SPECIFIC_ROOM);
+        }
+        return reservations;
+
     }
 
-    public List<Reservation> getReservationsByState(boolean state) {
-        return null;
+    public List<Reservation> getReservationsByState(State state) {
+        List<Reservation> reservations = reservationRepo.findReservationByState(state);
+        if (reservations.isEmpty()) {
+            throw new ReservationNotFoundException(ReservationException.NO_RESERVATION_WITH_THAT_STATE);
+        }
+
+        return reservations;
+
     }
 
-    public Reservation createReservation(Reservation rev) {
-        return null;
+    public Reservation createReservation(Reservation rev)
+    {
+        if(!Date.checkValidDate(rev.getDate())){
+            throw new ReservationNotFoundException(ReservationException.NOT_VALID_DATE_OF_RESERVATION);
+        }
+        if(reservationRepo.findReservationByRoomIdAndDateAndUserId(rev.getRoomId(),rev.getDate(),rev.getUserId()).isPresent()){
+            throw new ReservationNotFoundException(ReservationException.REV_ALREADY_EXIST);
+        }
+        roomController.reduceCapacityOfRoom(rev.getRoomId());
+        return reservationRepo.save(rev);
     }
 
-    public Reservation updateReservation(String rev, Reservation newRev) {
-        return null;
+    public Reservation updateReservation(String revId, Reservation newRev) {
+        Reservation reservation = reservationRepo.findById(revId)
+                .orElseThrow(()-> new ReservationNotFoundException(ReservationException.REV_NOT_FOUND));
+
+        this.changeReservationState(revId,newRev.getState());
+        reservation.setUserName(newRev.getUserName());
+        reservation.setUserId(newRev.getUserId());
+        reservation.setRole(newRev.getRole());
+        reservation.setDate(newRev.getDate());
+        reservation.setRoomId(newRev.getRoomId());
+        reservation.setPeople(newRev.getPeople());
+        reservation.setLoans(newRev.getLoans());
+        return reservationRepo.save(reservation);
+
     }
 
     public Reservation deleteReservation(String revId) {
-        return null;
+        Reservation reservation = reservationRepo.findById(revId)
+                .orElseThrow(()-> new RoomNotFoundException(RoomException.ROOM_NOT_FOUND));
+        reservationRepo.deleteById(revId);
+        return reservation;
     }
+    public void changeReservationState(@PathVariable String revId, @PathVariable State state){
+        Reservation reservation = reservationRepo.findById(revId)
+                .orElseThrow(()-> new ReservationNotFoundException(ReservationException.REV_NOT_FOUND));
+        if(!State.isValidState(state)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid state value");
 
+        }
+        reservation.setState(state);
+        if(state.equals(State.RESERVA_CANCELADA)|| state.equals(State.RESERVA_TERMINADA)){
+            roomController.increaseCapacityOfRoom(reservation.getRoomId());
+        }
+        reservationRepo.save(reservation);
+    }
     public List<Reservation> getAll() {
-        return null;
+        return reservationRepo.findAll();
     }
 }

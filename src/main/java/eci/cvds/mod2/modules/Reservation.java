@@ -48,7 +48,10 @@ public class Reservation {
     public void addLoan(String loanId) {
         this.loans.add(loanId);
     }
-
+    public void setLoans(Set<String> loans){
+        loans.clear();
+        this.loans.addAll(loans);
+    }
     public Set<String> getLoans() {
         return Collections.unmodifiableSet(loans);
     }

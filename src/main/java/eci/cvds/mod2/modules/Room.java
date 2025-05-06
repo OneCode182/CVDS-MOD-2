@@ -1,4 +1,8 @@
 package eci.cvds.mod2.modules;
+import eci.cvds.mod2.exceptions.ReservationException;
+import eci.cvds.mod2.exceptions.ReservationNotFoundException;
+import eci.cvds.mod2.exceptions.RoomAlreadyExistException;
+import eci.cvds.mod2.exceptions.RoomException;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -36,6 +40,16 @@ public class Room {
     }
     public Set<String> getElementList() {
         return new HashSet<>(elementList);
+    }
+    public void reduceCapacity(){
+        if(capacity>0){
+            capacity-=1;
+        }else {
+            throw new RoomAlreadyExistException(RoomException.QUANTITY_CANNOT_BE_LOWER_THAN_0);
+        }
+    }
+    public void increaseCapacity(){
+        capacity+=1;
     }
 
 }
