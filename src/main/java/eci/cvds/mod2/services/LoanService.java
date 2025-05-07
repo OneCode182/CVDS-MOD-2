@@ -28,8 +28,13 @@ public class LoanService {
     }
 
     public List<Loan> getLoansByState(State state) {
-        return loanRepo.findByState(state);
+        List<Loan> loans = loanRepo.findByState(state);
+        if (loans.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No loans found for state: " + state);
+        }
+        return loans;
     }
+
 
     public Loan createLoan(Loan loan) {
         if (!State.isValidState(loan.getState())) {
@@ -49,12 +54,14 @@ public class LoanService {
 
     public Loan deleteLoan(String loanId) {
         Loan loan = loanRepo.findById(loanId)
-                .orElseThrow(()-> new LoanNotFoundException(LoanException.LOAN_NOT_FOUND));
+                .orElseThrow(() -> new LoanNotFoundException("Loan not found"));
         loanRepo.deleteById(loanId);
         return loan;
     }
 
+
     public List<Loan> getAll() {
         return loanRepo.findAll();
     }
+
 }
