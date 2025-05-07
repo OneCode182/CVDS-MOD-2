@@ -2,24 +2,37 @@ package eci.cvds.mod2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eci.cvds.mod2.controllers.RoomController;
 import eci.cvds.mod2.modules.Room;
 import eci.cvds.mod2.services.RoomsService;
+import io.swagger.v3.oas.models.media.MediaType;
 
 
 @SpringBootTest
 public class RoomTest {
+    @Autowired
+    private MockMvc mockMvc;
 
     @Mock
     private RoomsService roomsService;
@@ -27,96 +40,121 @@ public class RoomTest {
     @InjectMocks
     private RoomController roomController;
 
-    @Test
-    void testGetRoomById() {
-        String roomId = "R101";
-        Room room = new Room(roomId,"A", 23);
-        when(roomsService.getRoomById(roomId).get()).thenReturn(room);
-        ResponseEntity<Room> response = roomController.getRoomById(roomId);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(room, response.getBody());
+    private ObjectMapper objectMapper = new ObjectMapper();
+
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+        mockMvc = MockMvcBuilders.standaloneSetup(roomController).build();
     }
 
     @Test
-    void testGetRoomById_NotFound() {
-        String roomId = "R999";
-        Room room = new Room(roomId,"A", 23);
-        when(roomsService.getRoomById(roomId).get()).thenReturn(room);
-        ResponseEntity<Room> response = roomController.getRoomById(roomId);
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertNull(response.getBody());
+    void shouldReturn200WhenGettingAllRooms() throws Exception {
+        List<Room> rooms = Arrays.asList(
+                new Room("123", "BuildingA", 23),
+                new Room("456", "BuildingB", 32)
+        );
+
+        when(roomsService.getAll()).thenReturn(rooms);
+
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void testGetRoomsByBuilding() {
-        String building = "BuildingA";
-        Room room = new Room("23",building, 23);
-        List<Room> roomList = List.of(room);
-        when(roomsService.getRoomsByBuilding(building)).thenReturn(roomList);
-        List<Room> response = roomController.getRoomsByBuilding(building);
-        assertEquals(1, response.size());
-        assertEquals(roomList, response);
+    void shouldReturn200WhenGettingRoomById() throws Exception {
+        Room room = new Room("123", "BuildingA", 23);
+        when(roomsService.getRoomById("R1")).thenReturn(Optional.of(room));
+
+        mockMvc.perform(get("/id/R1"))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void testGetRoomByCapacity() {
-        int capacity = 30;
-        Room room = new Room("23","A", capacity);
-        List<Room> roomList = List.of(room);
-        when(roomsService.getRoomByCapacity(capacity)).thenReturn(roomList);
-        List<Room> response = roomController.getRoomByCapacity(capacity);
-        assertEquals(1, response.size());
-        assertEquals(roomList, response);
+    void shouldReturn404WhenRoomIdNotFound() throws Exception {
+        when(roomsService.getRoomById("9999")).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/id/9999"))
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    void testCreateRoom() {
-        Room room = new Room("23","A", 23);
-        when(roomsService.createRoom(room)).thenReturn(room);
-        ResponseEntity<Room> response = roomController.createRoom(room);
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(room, response.getBody());
+    void shouldReturn200WhenGettingRoomsByBuilding() throws Exception {
+        List<Room> rooms = List.of(new Room("123", "BuildingA", 23));
+        when(roomsService.getRoomsByBuilding("BuildingA")).thenReturn(rooms);
+
+        mockMvc.perform(get("/building/BuildingA"))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void testUpdateRoom() {
-        String idRoom = "123";
-        Room room = new Room(idRoom,"A", 23);
-        when(roomsService.createRoom(room)).thenReturn(room);
-        room.setCapacity(32);
-        when(roomsService.updateRoom(idRoom, room)).thenReturn(room);
-        ResponseEntity<Room> response = roomController.updateRoom(idRoom, room);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(room, response.getBody());
+    void shouldReturn200WhenGettingRoomsByCapacity() throws Exception {
+        List<Room> rooms = List.of(new Room("123", "BuildingA", 23));
+        when(roomsService.getRoomByCapacity(23)).thenReturn(rooms);
+
+        mockMvc.perform(get("/capacity/23"))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void testDeleteRoom_Success() {
-        String roomId = "R101";
-        when(roomsService.deleteRoom(roomId)).thenReturn(true);
-        ResponseEntity<String> response = roomController.deleteRoom(roomId);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Room successfully deleted", response.getBody());
+    void shouldReturn201WhenCreatingRoom() throws Exception {
+        Room room = new Room("123", "BuildingA", 23);
+        when(roomsService.createRoom(any(Room.class))).thenReturn(room);
+
+        mockMvc.perform(post("/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(room)))
+                .andExpect(status().isCreated());
     }
 
     @Test
-    void testDeleteRoom_Failure() {
-        String roomId = "R101";
-        when(roomsService.deleteRoom(roomId)).thenReturn(false);
-        ResponseEntity<String> response = roomController.deleteRoom(roomId);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertNull(response.getBody());
+    void shouldReturn500WhenRoomCreationFails() throws Exception {
+        Room room = new Room("123", "BuildingA", 23);
+        when(roomsService.createRoom(any(Room.class))).thenReturn(null);
+
+        mockMvc.perform(post("/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(room)))
+                .andExpect(status().isInternalServerError());
     }
 
     @Test
-    void testGetAllRooms() {
-        Room room1 = new Room("123","A", 23);
-        Room room2 = new Room("456","B", 32);
-        List<Room> roomList = List.of(room1,room2);
-        when(roomsService.getAll()).thenReturn(roomList);
-        List<Room> response = roomController.getAll();
-        assertEquals(2, response.size());
-        assertEquals(roomList, response);
+    void shouldReturn200WhenUpdatingRoom() throws Exception {
+        Room updatedRoom = new Room("123", "BuildingA", 23);
+        when(roomsService.updateRoom(eq("123"), any(Room.class))).thenReturn(updatedRoom);
+
+        mockMvc.perform(put("/123")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatedRoom)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturn500WhenUpdateFails() throws Exception {
+        Room room = new Room("123", "BuildingA", 23);
+        when(roomsService.updateRoom(eq("123"), any(Room.class))).thenReturn(null);
+
+        mockMvc.perform(put("/123")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(room)))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    void shouldReturn200WhenDeletingRoom() throws Exception {
+        when(roomsService.deleteRoom("123")).thenReturn(true);
+
+        mockMvc.perform(delete("/123"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Room successfully deleted"));
+    }
+
+    @Test
+    void shouldReturn500WhenDeletingRoomFails() throws Exception {
+        when(roomsService.deleteRoom("123")).thenReturn(false);
+
+        mockMvc.perform(delete("/123"))
+                .andExpect(status().isInternalServerError());
     }
 }
 
