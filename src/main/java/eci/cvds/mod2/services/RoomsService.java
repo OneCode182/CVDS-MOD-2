@@ -56,12 +56,15 @@ public class RoomsService {
         return roomRepo.save(room);
 
     }
+
+
     public void addElementToRoom(String roomId, String elementId){
         elementsService.getElementById(elementId);
         Room room = this.getRoomById(roomId);
         room.addElement(elementId);
         roomRepo.save(room);
     }
+
     public void removeElementFromRoom(String roomId, String elementId){
         elementsService.getElementById(elementId);
         Room room = this.getRoomById(roomId);

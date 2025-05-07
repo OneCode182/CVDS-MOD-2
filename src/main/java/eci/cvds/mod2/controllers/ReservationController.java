@@ -13,7 +13,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/revs")
-@CrossOrigin(origins = "*")
 public class ReservationController {
 
     private final ReservationService reservationService;
