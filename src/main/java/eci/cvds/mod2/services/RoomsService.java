@@ -20,8 +20,8 @@ public class RoomsService {
 
     }
 
-    public Room getRoomById(String roomId) {
-        return roomRepo.findById(roomId)
+    public Room getRoomByRoomId(String roomId) {
+        return roomRepo.findByRoomId(roomId)
                 .orElseThrow(()->new RoomNotFoundException(RoomException.ROOM_NOT_FOUND));
     }
 
@@ -58,13 +58,13 @@ public class RoomsService {
     }
     public void addElementToRoom(String roomId, String elementId){
         elementsService.getElementById(elementId);
-        Room room = this.getRoomById(roomId);
+        Room room = this.getRoomByRoomId(roomId);
         room.addElement(elementId);
         roomRepo.save(room);
     }
     public void removeElementFromRoom(String roomId, String elementId){
         elementsService.getElementById(elementId);
-        Room room = this.getRoomById(roomId);
+        Room room = this.getRoomByRoomId(roomId);
         room.removeElement(elementId);
         roomRepo.save(room);
     }
