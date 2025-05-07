@@ -7,6 +7,7 @@ import eci.cvds.mod2.reposistories.ElementsRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -51,5 +52,8 @@ public class ElementsService {
         element.setQuantity(newElement.getQuantity());
         element.setDescription(newElement.getDescription());
         return elementsRepo.save(element);
+    }
+    public List<RecreationalElement> getAll(){
+        return elementsRepo.findAll();
     }
 }

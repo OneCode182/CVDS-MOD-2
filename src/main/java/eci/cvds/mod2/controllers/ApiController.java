@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*")
 @Tag(name = "API de Salud", description = "Operaciones para verificar el estado de la API")
 public class ApiController {
 

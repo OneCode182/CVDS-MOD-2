@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/loans")
-@CrossOrigin(origins = "*")
+
 public class LoanController {
     LoanService loanService;
     @Autowired
@@ -44,6 +44,9 @@ public class LoanController {
         loanService.deleteLoan(loanId);
         return ResponseEntity.ok("Loan successfully deleted");
     }
-
+    @GetMapping
+    public List<Loan> getAll(){
+        return loanService.getAll();
+    }
 
 }
