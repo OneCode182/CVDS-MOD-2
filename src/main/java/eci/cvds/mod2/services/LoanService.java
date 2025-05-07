@@ -1,5 +1,6 @@
 package eci.cvds.mod2.services;
 
+import eci.cvds.mod2.controllers.ElementsController;
 import eci.cvds.mod2.exceptions.LoanException;
 import eci.cvds.mod2.exceptions.LoanNotFoundException;
 import eci.cvds.mod2.modules.Loan;
@@ -16,9 +17,11 @@ import java.util.List;
 @Service
 public class LoanService {
     private LoanRepo loanRepo;
+    private ElementsController elementsController;
     @Autowired
-    public LoanService(LoanRepo loanRepo){
+    public LoanService(LoanRepo loanRepo, ElementsController elementsController){
         this.loanRepo=loanRepo;
+        this.elementsController = elementsController;
     }
 
 
@@ -40,13 +43,14 @@ public class LoanService {
         if (!State.isValidState(loan.getState())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid state value");
         }
+        elementsController.getElementById(loan.getElementId());
         return loanRepo.save(loan);
     }
 
     public Loan updateLoan(String loanId, Loan newLoan) {
         Loan loan = loanRepo.findById(loanId)
                 .orElseThrow(() -> new LoanNotFoundException(LoanException.LOAN_NOT_FOUND));
-
+        elementsController.getElementById(newLoan.getElementId());
         loan.setElementId(newLoan.getElementId());
         loan.setState(newLoan.getState());
         return loanRepo.save(loan);

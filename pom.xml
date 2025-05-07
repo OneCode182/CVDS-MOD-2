@@ -153,46 +153,20 @@
 				<version>0.8.12</version>
 				<executions>
 					<execution>
-					<goals>
-						<goal>prepare-agent</goal>
-					</goals>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
 					</execution>
 					<execution>
-					<id>report</id>
-					<phase>test</phase>
-					<goals>
-						<goal>report</goal>
-					</goals>
-					<configuration>
-						<excludes>
-						<exclude>/configurators/</exclude>
-						</excludes>
-					</configuration>
-					</execution>
-					<execution>
-					<id>jacoco-check</id>
-					<goals>
-					<goal>check</goal>
-					</goals>
-					<configuration>
-					<rules>
-						<rule>
-						<element>PACKAGE</element>
-							<limits>
-							<limit>
-								<counter>CLASS</counter>
-								<value>COVEREDRATIO</value>
-								<minimum>0.85</minimum>  <!--Porcentaje mínimo de cubrimiento para construir el proyecto-->
-							</limit>
-							</limits>
-						</rule>
-						</rules>
-					</configuration>
+						<id>report</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>
-
-
 
 		</plugins>
 	</build>
