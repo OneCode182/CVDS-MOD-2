@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/elements")
 @Tag(name = "Elementos Recreativos", description = "Operaciones relacionadas con elementos recreativos")
@@ -116,4 +118,9 @@ public class ElementsController {
         elementsService.updateElement(elementId, newElement);
         return ResponseEntity.ok("Element successfully updated");
     }
+    @GetMapping
+    public List<RecreationalElement> getAll(){
+        return elementsService.getAll();
+    }
+
 }

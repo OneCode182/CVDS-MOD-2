@@ -3,6 +3,7 @@ package eci.cvds.mod2.util;
 import eci.cvds.mod2.exceptions.ElementException;
 import eci.cvds.mod2.exceptions.ElementNotFoundException;
 import eci.cvds.mod2.exceptions.LoanNotFoundException;
+import eci.cvds.mod2.exceptions.ReservationNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,6 +29,10 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(LoanNotFoundException.class)
     public ResponseEntity<String> handleElementNotFound(LoanNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+    @ExceptionHandler(ReservationNotFoundException.class)
+    public ResponseEntity<String> handleElementNotFound(ReservationNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 }

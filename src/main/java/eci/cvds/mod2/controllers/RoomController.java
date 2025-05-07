@@ -1,5 +1,7 @@
 package eci.cvds.mod2.controllers;
 
+import eci.cvds.mod2.exceptions.RoomException;
+import eci.cvds.mod2.exceptions.RoomNotFoundException;
 import eci.cvds.mod2.modules.Loan;
 import eci.cvds.mod2.modules.Room;
 import eci.cvds.mod2.services.RoomsService;
@@ -20,6 +22,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/rooms")
+
 @Tag(name = "Salas", description = "Operaciones relacionadas con las Salas de Bienestar Universitario")
 public class RoomController {
 
@@ -39,7 +42,7 @@ public class RoomController {
     })
     @GetMapping("/id/{roomId}")
     public ResponseEntity<Room> getRoomById(@PathVariable String roomId) {
-        Room room = roomsService.getRoomById(roomId);
+        Room room = roomsService.getRoomByRoomId(roomId);
         return ResponseEntity.ok(room);
     }
 
@@ -163,6 +166,16 @@ public class RoomController {
     public ResponseEntity<String> removeElementFromRoom(@PathVariable String roomId,@PathVariable String elementId){
         roomsService.removeElementFromRoom(roomId,elementId);
         return ResponseEntity.ok("Element removed successfully");
+    }
+    @PutMapping("/reduce/{roomId}")
+    public ResponseEntity<String> reduceCapacityOfRoom(@PathVariable String roomId, int people){
+        roomsService.reduceCapacityOfRoom(roomId, people);
+        return ResponseEntity.ok("The capacity was successfully reduced");
+    }
+    @PutMapping("/increase/{roomId}")
+    public ResponseEntity<String> increaseCapacityOfRoom(@PathVariable String roomId, int people){
+        roomsService.increaseCapacityOfRoom(roomId, people);
+        return ResponseEntity.ok("The capacity was successfully increased");
     }
 }
 

@@ -22,6 +22,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/loans")
+
 @Tag(name = "Prestamos", description = "Operaciones relacionadas con los prestamos de elementos recreativos")
 public class LoanController {
     LoanService loanService;
@@ -112,6 +113,9 @@ public class LoanController {
         loanService.deleteLoan(loanId);
         return ResponseEntity.ok("Loan successfully deleted");
     }
-
+    @GetMapping
+    public List<Loan> getAll(){
+        return loanService.getAll();
+    }
 
 }

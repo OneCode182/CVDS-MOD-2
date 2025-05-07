@@ -20,8 +20,8 @@ public class RoomsService {
 
     }
 
-    public Room getRoomById(String roomId) {
-        return roomRepo.findById(roomId)
+    public Room getRoomByRoomId(String roomId) {
+        return roomRepo.findByRoomId(roomId)
                 .orElseThrow(()->new RoomNotFoundException(RoomException.ROOM_NOT_FOUND));
     }
 
@@ -34,7 +34,7 @@ public class RoomsService {
     }
 
     public Room createRoom(Room room) {
-        if (roomRepo.findById(room.getRoomId()).isPresent()) {
+        if (roomRepo.findByRoomId(room.getRoomId()).isPresent()) {
             throw new RoomAlreadyExistException(RoomException.ROOM_ALREADY_EXIST);
         }
         return roomRepo.save(room);
@@ -48,7 +48,7 @@ public class RoomsService {
     }
 
     public Room updateRoom(String roomId, Room newRoom) {
-        Room room = roomRepo.findById(roomId)
+        Room room = roomRepo.findByRoomId(roomId)
                 .orElseThrow(()-> new RoomNotFoundException(RoomException.ROOM_NOT_FOUND));
         room.setRoomId(newRoom.getRoomId());
         room.setBuilding(newRoom.getBuilding());
@@ -60,19 +60,31 @@ public class RoomsService {
 
     public void addElementToRoom(String roomId, String elementId){
         elementsService.getElementById(elementId);
-        Room room = this.getRoomById(roomId);
+        Room room = this.getRoomByRoomId(roomId);
         room.addElement(elementId);
         roomRepo.save(room);
     }
 
     public void removeElementFromRoom(String roomId, String elementId){
         elementsService.getElementById(elementId);
-        Room room = this.getRoomById(roomId);
+        Room room = this.getRoomByRoomId(roomId);
         room.removeElement(elementId);
         roomRepo.save(room);
     }
 
     public List<Room> getAll() {
         return roomRepo.findAll();
+    }
+    public void reduceCapacityOfRoom(String roomId, int people){
+        Room room = roomRepo.findByRoomId(roomId)
+                .orElseThrow(()-> new RoomNotFoundException(RoomException.ROOM_NOT_FOUND));
+        room.reduceCapacity(people);
+        roomRepo.save(room);
+    }
+    public void increaseCapacityOfRoom(String roomId, int people){
+        Room room = roomRepo.findByRoomId(roomId)
+                .orElseThrow(()-> new RoomNotFoundException(RoomException.ROOM_NOT_FOUND));
+        room.increaseCapacity(people);
+        roomRepo.save(room);
     }
 }

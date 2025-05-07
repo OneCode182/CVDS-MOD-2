@@ -4,6 +4,7 @@ import eci.cvds.mod2.modules.Reservation;
 import eci.cvds.mod2.services.ReservationService;
 import eci.cvds.mod2.util.Date;
 import eci.cvds.mod2.util.Role;
+import eci.cvds.mod2.util.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +49,7 @@ public class ReservationController {
     }
 
     @GetMapping("/state/{state}")
-    public List<Reservation> getReservationsByState(@PathVariable boolean state) {
+    public List<Reservation> getReservationsByState(@PathVariable State state) {
         return reservationService.getReservationsByState(state);
     }
 
@@ -69,8 +70,17 @@ public class ReservationController {
         reservationService.deleteReservation(revId);
         return ResponseEntity.ok("Reservation successfully deleted");
     }
+    @PutMapping("/state/{revId}/{state}")
+    public ResponseEntity<String> changeReservationState(@PathVariable String revId, @PathVariable State state){
+        reservationService.changeReservationState(revId,state);
+        return ResponseEntity.ok("The state was successfully changed");
+    }
     @GetMapping
     public List<Reservation> getAll() {
         return reservationService.getAll();
+    }
+    @PutMapping("/{revId}/{loanId}")
+    public ResponseEntity<Reservation> addLoan(@PathVariable String revId,@PathVariable String loanId){
+        return ResponseEntity.ok(reservationService.addLoan(revId,loanId));
     }
 }
