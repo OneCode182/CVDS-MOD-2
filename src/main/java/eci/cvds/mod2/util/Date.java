@@ -7,6 +7,8 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.TemporalAmount;
+
 @Setter
 @Getter
 @AllArgsConstructor
@@ -14,4 +16,12 @@ import java.time.LocalTime;
 public class Date {
     LocalDate day;
     LocalTime time;
+
+    public static boolean checkValidDate(Date date) {
+        LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
+
+        return date.getDay().isEqual(today) &&
+                date.getTime().isAfter(now.plusHours(2));
+    }
 }

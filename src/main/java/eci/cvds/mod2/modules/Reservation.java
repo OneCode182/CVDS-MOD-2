@@ -46,10 +46,21 @@ public class Reservation {
     private int people;
 
     public void addLoan(String loanId) {
+        if (loans == null) {
+            this.loans = new HashSet<>();
+        }
         this.loans.add(loanId);
+    }
+    public void setLoans(Set<String> loans) {
+        if (loans == null) {
+            this.loans = new HashSet<>();
+        } else {
+            this.loans = new HashSet<>(loans);
+        }
     }
 
     public Set<String> getLoans() {
-        return Collections.unmodifiableSet(loans);
+        return Collections.unmodifiableSet(loans != null ? loans : new HashSet<>());
     }
+
 }
