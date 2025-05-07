@@ -34,7 +34,7 @@ public class RoomsService {
     }
 
     public Room createRoom(Room room) {
-        if (roomRepo.findById(room.getRoomId()).isPresent()) {
+        if (roomRepo.findByRoomId(room.getRoomId()).isPresent()) {
             throw new RoomAlreadyExistException(RoomException.ROOM_ALREADY_EXIST);
         }
         return roomRepo.save(room);
@@ -48,7 +48,7 @@ public class RoomsService {
     }
 
     public Room updateRoom(String roomId, Room newRoom) {
-        Room room = roomRepo.findById(roomId)
+        Room room = roomRepo.findByRoomId(roomId)
                 .orElseThrow(()-> new RoomNotFoundException(RoomException.ROOM_NOT_FOUND));
         room.setRoomId(newRoom.getRoomId());
         room.setBuilding(newRoom.getBuilding());
@@ -72,16 +72,16 @@ public class RoomsService {
     public List<Room> getAll() {
         return roomRepo.findAll();
     }
-    public void reduceCapacityOfRoom(String roomId){
-        Room room = roomRepo.findById(roomId)
+    public void reduceCapacityOfRoom(String roomId, int people){
+        Room room = roomRepo.findByRoomId(roomId)
                 .orElseThrow(()-> new RoomNotFoundException(RoomException.ROOM_NOT_FOUND));
-        room.reduceCapacity();
+        room.reduceCapacity(people);
         roomRepo.save(room);
     }
-    public void increaseCapacityOfRoom(String roomId){
-        Room room = roomRepo.findById(roomId)
+    public void increaseCapacityOfRoom(String roomId, int people){
+        Room room = roomRepo.findByRoomId(roomId)
                 .orElseThrow(()-> new RoomNotFoundException(RoomException.ROOM_NOT_FOUND));
-        room.increaseCapacity();
+        room.increaseCapacity(people);
         roomRepo.save(room);
     }
 }

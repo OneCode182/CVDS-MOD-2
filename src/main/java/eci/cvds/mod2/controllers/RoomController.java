@@ -75,13 +75,13 @@ public class RoomController {
         return ResponseEntity.ok("Element removed successfully");
     }
     @PutMapping("/reduce/{roomId}")
-    public ResponseEntity<String> reduceCapacityOfRoom(@PathVariable String roomId){
-        roomsService.reduceCapacityOfRoom(roomId);
+    public ResponseEntity<String> reduceCapacityOfRoom(@PathVariable String roomId, int people){
+        roomsService.reduceCapacityOfRoom(roomId, people);
         return ResponseEntity.ok("The capacity was successfully reduced");
     }
     @PutMapping("/increase/{roomId}")
-    public ResponseEntity<String> increaseCapacityOfRoom(@PathVariable String roomId){
-        roomsService.increaseCapacityOfRoom(roomId);
+    public ResponseEntity<String> increaseCapacityOfRoom(@PathVariable String roomId, int people){
+        roomsService.increaseCapacityOfRoom(roomId, people);
         return ResponseEntity.ok("The capacity was successfully increased");
     }
 }

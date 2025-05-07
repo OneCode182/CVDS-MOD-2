@@ -79,4 +79,8 @@ public class ReservationController {
     public List<Reservation> getAll() {
         return reservationService.getAll();
     }
+    @PutMapping("/{revId}/{loanId}")
+    public ResponseEntity<Reservation> addLoan(@PathVariable String revId,@PathVariable String loanId){
+        return ResponseEntity.ok(reservationService.addLoan(revId,loanId));
+    }
 }

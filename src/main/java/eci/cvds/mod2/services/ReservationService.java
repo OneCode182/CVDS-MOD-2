@@ -1,7 +1,9 @@
 package eci.cvds.mod2.services;
 
+import eci.cvds.mod2.controllers.LoanController;
 import eci.cvds.mod2.controllers.RoomController;
 import eci.cvds.mod2.exceptions.*;
+import eci.cvds.mod2.modules.Loan;
 import eci.cvds.mod2.modules.Reservation;
 import eci.cvds.mod2.modules.Room;
 import eci.cvds.mod2.reposistories.ReservationRepo;
@@ -23,10 +25,12 @@ import java.util.Stack;
 public class ReservationService {
     private final ReservationRepo reservationRepo;
     private final RoomController roomController;
+    private final LoanController loanController;
     @Autowired
-    public ReservationService(ReservationRepo reservationRepo, RoomController roomController){
+    public ReservationService(ReservationRepo reservationRepo, RoomController roomController, LoanController loanController){
         this.reservationRepo = reservationRepo;
         this.roomController = roomController;
+        this.loanController=loanController;
     }
 
     public List<Reservation> getReservationsByUserId(String userId) {
@@ -50,7 +54,7 @@ public class ReservationService {
     public List<Reservation> getReservationsByDay(Date date) {
         List<Reservation> reservations = reservationRepo.findReservationByDate(date);
         if (reservations.isEmpty()) {
-            throw new ReservationNotFoundException(ReservationException.NO_RESERVATIONS_ON_SPECIFIC_DAY);
+                throw new ReservationNotFoundException(ReservationException.NO_RESERVATIONS_ON_SPECIFIC_DAY);
         }
         return reservations;
     }
@@ -76,21 +80,20 @@ public class ReservationService {
 
     public Reservation createReservation(Reservation rev)
     {
-        if(!Date.checkValidDate(rev.getDate())){
-            throw new ReservationNotFoundException(ReservationException.NOT_VALID_DATE_OF_RESERVATION);
-        }
+//        if(!Date.checkValidDate(rev.getDate())){
+//            throw new ReservationNotFoundException(ReservationException.NOT_VALID_DATE_OF_RESERVATION);
+//        }
         if(reservationRepo.findReservationByRoomIdAndDateAndUserId(rev.getRoomId(),rev.getDate(),rev.getUserId()).isPresent()){
             throw new ReservationNotFoundException(ReservationException.REV_ALREADY_EXIST);
         }
-        roomController.reduceCapacityOfRoom(rev.getRoomId());
+        roomController.reduceCapacityOfRoom(rev.getRoomId(), rev.getPeople());
         return reservationRepo.save(rev);
     }
 
     public Reservation updateReservation(String revId, Reservation newRev) {
         Reservation reservation = reservationRepo.findById(revId)
                 .orElseThrow(()-> new ReservationNotFoundException(ReservationException.REV_NOT_FOUND));
-
-        this.changeReservationState(revId,newRev.getState());
+        roomController.getRoomById(newRev.getRoomId());
         reservation.setUserName(newRev.getUserName());
         reservation.setUserId(newRev.getUserId());
         reservation.setRole(newRev.getRole());
@@ -117,12 +120,17 @@ public class ReservationService {
         }
         reservation.setState(state);
         if(state.equals(State.RESERVA_CANCELADA)|| state.equals(State.RESERVA_TERMINADA)){
-            roomController.increaseCapacityOfRoom(reservation.getRoomId());
+            roomController.increaseCapacityOfRoom(reservation.getRoomId(), reservation.getPeople());
         }
         reservationRepo.save(reservation);
     }
     public List<Reservation> getAll() {
         return reservationRepo.findAll();
     }
-
+    public Reservation addLoan(String revId,String loanId){
+        Reservation reservation= this.getReservationById(revId);
+        loanController.getLoanById(loanId);
+        reservation.addLoan(loanId);
+        return reservationRepo.save(reservation);
+    }
 }
