@@ -167,11 +167,27 @@ public class RoomController {
         roomsService.removeElementFromRoom(roomId,elementId);
         return ResponseEntity.ok("Element removed successfully");
     }
+
+
+    @Operation(summary = "Reducir la capacidad de una sala")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "The capacity was successfully reduced",
+                    content = @Content(schema = @Schema(implementation = Room.class))),
+            @ApiResponse(responseCode = "404", description = "The room searched was not found"),
+            @ApiResponse(responseCode = "400", description = "Cannot book another reservation the room is full")
+    })
     @PutMapping("/reduce/{roomId}")
     public ResponseEntity<String> reduceCapacityOfRoom(@PathVariable String roomId, int people){
         roomsService.reduceCapacityOfRoom(roomId, people);
         return ResponseEntity.ok("The capacity was successfully reduced");
     }
+
+    @Operation(summary = "Aumentar la capacidad de una sala")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "The capacity was successfully increased",
+                    content = @Content(schema = @Schema(implementation = Room.class))),
+            @ApiResponse(responseCode = "404", description = "The room searched was not found")
+    })
     @PutMapping("/increase/{roomId}")
     public ResponseEntity<String> increaseCapacityOfRoom(@PathVariable String roomId, int people){
         roomsService.increaseCapacityOfRoom(roomId, people);

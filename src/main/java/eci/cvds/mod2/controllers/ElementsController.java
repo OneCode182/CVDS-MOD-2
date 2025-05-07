@@ -118,6 +118,16 @@ public class ElementsController {
         elementsService.updateElement(elementId, newElement);
         return ResponseEntity.ok("Element successfully updated");
     }
+
+
+    @Operation(
+            summary = "Obtener todos los elementos",
+            description = "Retorna un listado de todos los elementos recreativos.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Elementos encontrados",
+                            content = @Content(schema = @Schema(implementation = RecreationalElement.class)))
+            }
+    )
     @GetMapping
     public List<RecreationalElement> getAll(){
         return elementsService.getAll();
