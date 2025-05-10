@@ -113,9 +113,5 @@ public class LoanController {
         loanService.deleteLoan(loanId);
         return ResponseEntity.ok("Loan successfully deleted");
     }
-    @GetMapping
-    public List<Loan> getAll(){
-        return loanService.getAll();
-    }
 
 }

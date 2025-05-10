@@ -4,12 +4,13 @@ import eci.cvds.mod2.exceptions.ElementException;
 import eci.cvds.mod2.exceptions.ElementNotFoundException;
 import eci.cvds.mod2.modules.RecreationalElement;
 import eci.cvds.mod2.reposistories.ElementsRepo;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-
+@Getter
 @Service
 public class ElementsService {
     private final ElementsRepo elementsRepo;
