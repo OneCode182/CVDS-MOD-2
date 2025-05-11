@@ -96,8 +96,11 @@ public class ElementsController {
     )
     @DeleteMapping("/{elementId}")
     public ResponseEntity<String> deleteElement(@PathVariable String elementId) {
+        // Verifica si el elemento existe llamando a getElementById
+        elementsService.getElementById(elementId);  // Esto asegura que el elemento se obtenga antes de intentar eliminarlo.
+
         elementsService.deleteElement(elementId);
-        return ResponseEntity.ok("Element successfully deleted ");
+        return ResponseEntity.ok("Element successfully deleted");
     }
 
     @Operation(
