@@ -20,6 +20,6 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:3000", frontendUrl, allowedOrigin) // Permitir localhost:3000 (React) y la URL adicional
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS") // Métodos permitidos
                 .allowedHeaders("*") // Permitir cualquier cabecera
-                .allowCredentials(true); // Permitir credenciales (si es necesario)
+                .allowCredentials(true);
     }
 }
