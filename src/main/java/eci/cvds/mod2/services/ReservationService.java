@@ -26,11 +26,13 @@ public class ReservationService {
     private final ReservationRepo reservationRepo;
     private final RoomController roomController;
     private final LoanController loanController;
+    private final IEmailService emailService;
     @Autowired
-    public ReservationService(ReservationRepo reservationRepo, RoomController roomController, LoanController loanController){
+    public ReservationService(ReservationRepo reservationRepo, RoomController roomController, LoanController loanController, IEmailService emailService){
         this.reservationRepo = reservationRepo;
         this.roomController = roomController;
         this.loanController=loanController;
+        this.emailService=emailService;
     }
 
     public List<Reservation> getReservationsByUserId(String userId) {
@@ -78,16 +80,26 @@ public class ReservationService {
 
     }
 
-    public Reservation createReservation(Reservation rev)
-    {
-//        if(!Date.checkValidDate(rev.getDate())){
+    public Reservation createReservation(Reservation rev) {
+//        if (!Date.checkValidDate(rev.getDate())) {
 //            throw new ReservationNotFoundException(ReservationException.NOT_VALID_DATE_OF_RESERVATION);
 //        }
-        if(reservationRepo.findReservationByRoomIdAndDateAndUserId(rev.getRoomId(),rev.getDate(),rev.getUserId()).isPresent()){
+        if (reservationRepo.findReservationByRoomIdAndDateAndUserId(rev.getRoomId(), rev.getDate(), rev.getUserId()).isPresent()) {
             throw new ReservationNotFoundException(ReservationException.REV_ALREADY_EXIST);
         }
+
         roomController.reduceCapacityOfRoom(rev.getRoomId(), rev.getPeople());
-        return reservationRepo.save(rev);
+        Reservation savedReservation = reservationRepo.save(rev);
+
+        String[] to = {"santiago.amador-d@mail.escuelaing.edu.co"}; // Asegúrate de tener el correo real
+        String subject = "Confirmación de reserva";
+        String message = "Hola " + rev.getUserName() + ",\n\nTu reserva ha sido creada exitosamente para el día " +
+                rev.getDate().getDay().toString() + " a las " + rev.getDate().getTime().toString() +
+                " en la sala " + rev.getRoomId() + ".\n\nGracias.";
+
+        emailService.sendEmail(to, subject, message);
+
+        return savedReservation;
     }
 
     public Reservation updateReservation(String revId, Reservation newRev) {
