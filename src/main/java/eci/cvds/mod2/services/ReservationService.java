@@ -91,7 +91,7 @@ public class ReservationService {
         roomController.reduceCapacityOfRoom(rev.getRoomId(), rev.getPeople());
         Reservation savedReservation = reservationRepo.save(rev);
 
-        String[] to = {"santiago.amador-d@mail.escuelaing.edu.co"}; // Asegúrate de tener el correo real
+        String[] to = {"santiago.amador-d@mail.escuelaing.edu.co"};
         String subject = "Confirmación de reserva";
         String message = "Hola " + rev.getUserName() + ",\n\nTu reserva ha sido creada exitosamente para el día " +
                 rev.getDate().getDay().toString() + " a las " + rev.getDate().getTime().toString() +
