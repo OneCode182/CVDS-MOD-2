@@ -1,7 +1,6 @@
 package eci.cvds.mod2.config;
 
 
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -20,6 +19,6 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:3000", frontendUrl, allowedOrigin) // Permitir localhost:3000 (React) y la URL adicional
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS") // Métodos permitidos
                 .allowedHeaders("*") // Permitir cualquier cabecera
-                .allowCredentials(true); // Permitir credenciales (si es necesario)
+                .allowCredentials(true);
     }
 }

@@ -6,7 +6,7 @@ name: Build and deploy JAR app to Azure Web App - CVDS-MOD-2
 on:
   push:
     branches:
-      - main
+      - dev
   workflow_dispatch:
 
 jobs:
