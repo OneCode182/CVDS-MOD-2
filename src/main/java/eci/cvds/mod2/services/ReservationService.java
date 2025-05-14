@@ -121,6 +121,7 @@ public class ReservationService {
         Reservation reservation = reservationRepo.findById(revId)
                 .orElseThrow(()-> new RoomNotFoundException(RoomException.ROOM_NOT_FOUND));
         reservationRepo.deleteById(revId);
+        roomController.increaseCapacityOfRoom(reservation.getRoomId(), reservation.getPeople());
         return reservation;
     }
     public void changeReservationState(@PathVariable String revId, @PathVariable State state){
