@@ -21,7 +21,7 @@ import java.util.List;
 public class JwtFilter extends OncePerRequestFilter {
 
 
-    private final String SECRET_KEY = "ContraseñaSuperSecreta123";
+    private final String SECRET_KEY = "supersecretpassword1234567891011121314";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)

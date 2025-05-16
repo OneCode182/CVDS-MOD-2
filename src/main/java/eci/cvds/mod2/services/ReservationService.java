@@ -97,7 +97,11 @@ public class ReservationService {
                 rev.getDate().getDay().toString() + " a las " + rev.getDate().getTime().toString() +
                 " en la sala " + rev.getRoomId() + ".\n\nGracias.";
 
-        emailService.sendEmail(to, subject, message);
+        try{
+            emailService.sendEmail(to, subject, message);
+        }catch(Exception e){
+            System.err.println("Error al enviar el correo" + e.getMessage());
+        }
 
         return savedReservation;
     }
