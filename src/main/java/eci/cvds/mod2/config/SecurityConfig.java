@@ -35,10 +35,10 @@ public class SecurityConfig {
                                 "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**"
                         ).permitAll()
 
-                        .requestMatchers("/revs", "/revs/**").hasAnyRole("Sala_Administrator", "Student")
-                        .requestMatchers("/rooms", "/rooms/**").hasAnyRole("Sala_Administrator", "Student")
-                        .requestMatchers("/elements", "/elements/**").hasAnyRole("Sala_Administrator", "Student")
-                        .requestMatchers("/loans", "/loans/**").hasAnyRole("Sala_Administrator", "Student")
+                        .requestMatchers("/revs", "/revs/**").hasAnyRole("SALA_ADMIN", "STUDENT")
+                        .requestMatchers("/rooms", "/rooms/**").hasAnyRole("SALA_ADMIN", "STUDENT")
+                        .requestMatchers("/elements", "/elements/**").hasAnyRole("SALA_ADMIN", "STUDENT")
+                        .requestMatchers("/loans", "/loans/**").hasAnyRole("SALA_ADMIN", "STUDENT")
 
                         .anyRequest().authenticated()
                 )
