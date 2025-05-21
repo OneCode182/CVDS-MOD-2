@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import eci.cvds.mod2.modules.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +22,7 @@ import java.util.List;
 public class JwtFilter extends OncePerRequestFilter {
 
 
-    private final String SECRET_KEY = "ContraseñaSuperSecreta123";
+    private final String SECRET_KEY = "supersecretpassword1234567891011121314";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -67,11 +68,12 @@ public class JwtFilter extends OncePerRequestFilter {
             request.setAttribute("role", role);
             request.setAttribute("specialty", specialty);
 
+            CustomUserDetails userDetails = new CustomUserDetails(id, userName, email, name, role, specialty);
             SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role);
 
 
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                    userName, null, List.of(authority)
+                    userDetails, null, List.of(authority)
             );
             SecurityContextHolder.getContext().setAuthentication(authToken);
 

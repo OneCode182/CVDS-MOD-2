@@ -3,6 +3,7 @@ package eci.cvds.mod2.services;
 import eci.cvds.mod2.controllers.LoanController;
 import eci.cvds.mod2.controllers.RoomController;
 import eci.cvds.mod2.exceptions.*;
+import eci.cvds.mod2.modules.CustomUserDetails;
 import eci.cvds.mod2.modules.Loan;
 import eci.cvds.mod2.modules.Reservation;
 import eci.cvds.mod2.modules.Room;
@@ -13,6 +14,8 @@ import eci.cvds.mod2.util.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,6 +30,12 @@ public class ReservationService {
     private final RoomController roomController;
     private final LoanController loanController;
     private final IEmailService emailService;
+    private CustomUserDetails getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return (CustomUserDetails) auth.getPrincipal();
+    }
+
+
     @Autowired
     public ReservationService(ReservationRepo reservationRepo, RoomController roomController, LoanController loanController, IEmailService emailService){
         this.reservationRepo = reservationRepo;
@@ -34,7 +43,14 @@ public class ReservationService {
         this.loanController=loanController;
         this.emailService=emailService;
     }
-
+    private void checkAdminOrAdminstrativoRole() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
+        Role role = Role.fromString(user.getRole());
+        if (!(role.equals(Role.SALA_ADMIN))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para realizar esta acción");
+        }
+    }
     public List<Reservation> getReservationsByUserId(String userId) {
         List<Reservation> reservations = reservationRepo.findReservationByUserId(userId);
         if (reservations.isEmpty()) {
@@ -84,10 +100,13 @@ public class ReservationService {
 //        if (!Date.checkValidDate(rev.getDate())) {
 //            throw new ReservationNotFoundException(ReservationException.NOT_VALID_DATE_OF_RESERVATION);
 //        }
+        CustomUserDetails user = getCurrentUser();
+        rev.setUserId(user.getId());
+        rev.setUserName(user.getName());
+        rev.setRole(Role.fromString(user.getRole()));
         if (reservationRepo.findReservationByRoomIdAndDateAndUserId(rev.getRoomId(), rev.getDate(), rev.getUserId()).isPresent()) {
             throw new ReservationNotFoundException(ReservationException.REV_ALREADY_EXIST);
         }
-
         roomController.reduceCapacityOfRoom(rev.getRoomId(), rev.getPeople());
         Reservation savedReservation = reservationRepo.save(rev);
 
@@ -97,7 +116,11 @@ public class ReservationService {
                 rev.getDate().getDay().toString() + " a las " + rev.getDate().getTime().toString() +
                 " en la sala " + rev.getRoomId() + ".\n\nGracias.";
 
-        emailService.sendEmail(to, subject, message);
+        try{
+            emailService.sendEmail(to, subject, message);
+        }catch(Exception e){
+            System.err.println("Error al enviar el correo" + e.getMessage());
+        }
 
         return savedReservation;
     }
@@ -106,9 +129,10 @@ public class ReservationService {
         Reservation reservation = reservationRepo.findById(revId)
                 .orElseThrow(()-> new ReservationNotFoundException(ReservationException.REV_NOT_FOUND));
         roomController.getRoomById(newRev.getRoomId());
-        reservation.setUserName(newRev.getUserName());
-        reservation.setUserId(newRev.getUserId());
-        reservation.setRole(newRev.getRole());
+        CustomUserDetails user = getCurrentUser();
+        reservation.setUserName(user.getUserName());
+        reservation.setUserId(user.getId());
+        reservation.setRole(Role.fromString(user.getRole()));
         reservation.setDate(newRev.getDate());
         reservation.setRoomId(newRev.getRoomId());
         reservation.setPeople(newRev.getPeople());

@@ -35,10 +35,10 @@ public class SecurityConfig {
                                 "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**"
                         ).permitAll()
 
-                        .requestMatchers("/revs", "/revs/**").hasAnyRole("Sala_Administrator", "Student")
-                        .requestMatchers("/rooms", "/rooms/**").hasAnyRole("Sala_Administrator", "Student")
-                        .requestMatchers("/elements", "/elements/**").hasAnyRole("Sala_Administrator", "Student")
-                        .requestMatchers("/loans", "/loans/**").hasAnyRole("Sala_Administrator", "Student")
+                        .requestMatchers("/revs", "/revs/**").hasAnyRole("SALA_ADMIN", "STUDENT")
+                        .requestMatchers("/rooms", "/rooms/**").hasAnyRole("SALA_ADMIN", "STUDENT")
+                        .requestMatchers("/elements", "/elements/**").hasAnyRole("SALA_ADMIN", "STUDENT")
+                        .requestMatchers("/loans", "/loans/**").hasAnyRole("SALA_ADMIN", "STUDENT")
 
                         .anyRequest().authenticated()
                 )
@@ -61,7 +61,7 @@ public class SecurityConfig {
                         : List.of(localFrontendUrl)
         );
 
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:3001","https://sd57frhtsh.execute-api.us-east-1.amazonaws.com"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
         configuration.setAllowCredentials(true);
