@@ -22,7 +22,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/loans")
-
+@CrossOrigin(origins = "*")
 @Tag(name = "Prestamos", description = "Operaciones relacionadas con los prestamos de elementos recreativos")
 public class LoanController {
     LoanService loanService;
