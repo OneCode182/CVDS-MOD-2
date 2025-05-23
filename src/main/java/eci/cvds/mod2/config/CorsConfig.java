@@ -13,9 +13,9 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
 
         registry.addMapping("/**") // Aplicar CORS a todos los endpoints
-                .allowedOrigins("http://localhost:3001","http://localhost:3000","https://sd57frhtsh.execute-api.us-east-1.amazonaws.com")
+                .allowedOrigins("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true);
+                .allowCredentials(false);
     }
 }
