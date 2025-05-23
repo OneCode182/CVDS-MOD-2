@@ -21,6 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/revs")
+@CrossOrigin(origins = "*")
 @Tag(name = "Reservas de Salas", description = "Operaciones relacionadas con la reserva de salas")
 public class ReservationController {
 

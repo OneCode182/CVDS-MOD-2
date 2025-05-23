@@ -19,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/elements")
+@CrossOrigin(origins = "*")
 @Tag(name = "Elementos Recreativos", description = "Operaciones relacionadas con elementos recreativos")
 public class ElementsController {
     ElementsService elementsService;

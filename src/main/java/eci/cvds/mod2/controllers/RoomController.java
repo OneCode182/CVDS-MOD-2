@@ -22,7 +22,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/rooms")
-
+@CrossOrigin(origins = "*")
 @Tag(name = "Salas", description = "Operaciones relacionadas con las Salas de Bienestar Universitario")
 public class RoomController {
 
