@@ -51,17 +51,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        String localFrontendUrl = "http://localhost:3000";
 
-        String deployedFrontendUrl = System.getenv("ALLOWED_ORIGIN");
-
-        configuration.setAllowedOrigins(
-                deployedFrontendUrl != null
-                        ? List.of(localFrontendUrl, deployedFrontendUrl)
-                        : List.of(localFrontendUrl)
-        );
-
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:3001","https://sd57frhtsh.execute-api.us-east-1.amazonaws.com"));
+        configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
         configuration.setAllowCredentials(true);
