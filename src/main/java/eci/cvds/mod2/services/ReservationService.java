@@ -28,7 +28,6 @@ import java.util.Stack;
 public class ReservationService {
     private final ReservationRepo reservationRepo;
     private final RoomController roomController;
-    private final LoanController loanController;
     private final IEmailService emailService;
     private CustomUserDetails getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -37,10 +36,9 @@ public class ReservationService {
 
 
     @Autowired
-    public ReservationService(ReservationRepo reservationRepo, RoomController roomController, LoanController loanController, IEmailService emailService){
+    public ReservationService(ReservationRepo reservationRepo, RoomController roomController, IEmailService emailService){
         this.reservationRepo = reservationRepo;
         this.roomController = roomController;
-        this.loanController=loanController;
         this.emailService=emailService;
     }
     private void checkAdminOrAdminstrativoRole() {
@@ -129,14 +127,11 @@ public class ReservationService {
         Reservation reservation = reservationRepo.findById(revId)
                 .orElseThrow(()-> new ReservationNotFoundException(ReservationException.REV_NOT_FOUND));
         roomController.getRoomById(newRev.getRoomId());
-        CustomUserDetails user = getCurrentUser();
-        reservation.setUserName(user.getUserName());
-        reservation.setUserId(user.getId());
-        reservation.setRole(Role.fromString(user.getRole()));
+
         reservation.setDate(newRev.getDate());
         reservation.setRoomId(newRev.getRoomId());
         reservation.setPeople(newRev.getPeople());
-        reservation.setLoans(newRev.getLoans());
+
         return reservationRepo.save(reservation);
 
     }
@@ -148,7 +143,7 @@ public class ReservationService {
         roomController.increaseCapacityOfRoom(reservation.getRoomId(), reservation.getPeople());
         return reservation;
     }
-    public void changeReservationState(@PathVariable String revId, @PathVariable State state){
+    public void changeReservationState(String revId, State state){
         Reservation reservation = reservationRepo.findById(revId)
                 .orElseThrow(()-> new ReservationNotFoundException(ReservationException.REV_NOT_FOUND));
         if(!State.isValidState(state)){
@@ -164,10 +159,8 @@ public class ReservationService {
     public List<Reservation> getAll() {
         return reservationRepo.findAll();
     }
-    public Reservation addLoan(String revId,String loanId){
-        Reservation reservation= this.getReservationById(revId);
-        loanController.getLoanById(loanId);
-        reservation.addLoan(loanId);
-        return reservationRepo.save(reservation);
+    public List<Reservation> getReservationByTokenUser(){
+        CustomUserDetails user = getCurrentUser();
+        return getReservationsByUserId(user.getId());
     }
 }

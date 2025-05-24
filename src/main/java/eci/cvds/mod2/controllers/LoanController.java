@@ -2,6 +2,7 @@ package eci.cvds.mod2.controllers;
 
 import eci.cvds.mod2.modules.Loan;
 import eci.cvds.mod2.modules.RecreationalElement;
+import eci.cvds.mod2.modules.Reservation;
 import eci.cvds.mod2.services.LoanService;
 import eci.cvds.mod2.util.State;
 
@@ -112,6 +113,36 @@ public class LoanController {
     public ResponseEntity<String> deleteLoan(@PathVariable String loanId) {
         loanService.deleteLoan(loanId);
         return ResponseEntity.ok("Loan successfully deleted");
+    }
+    @Operation(
+            summary = "Obtener todos los prestamos",
+            description = "Retorna todos los prestamos.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Prestamoes encontrados",
+                            content = @Content(schema = @Schema(implementation = Reservation.class)))
+            }
+    )
+    @GetMapping
+    public List<Loan> getAll(){
+        return loanService.getAll();
+    }
+    @Operation(
+            summary = "Cambiar el estado de un prestamo",
+            description = "Cambia el estado de un prestamo dado su ID.",
+            parameters = {
+                    @Parameter(name = "loanId", description = "ID de la reserva", required = true, example = "642b7f1d0001fae3d4"),
+                    @Parameter(name = "state", description = "Nuevo estado de la reserva", required = true, example = "PRESTAMO_DEVUELTO")
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "The state was successfully changed"),
+                    @ApiResponse(responseCode = "404", description = "Loan not found"),
+                    @ApiResponse(responseCode = "400", description = "Bad Request")
+            }
+    )
+    @PutMapping("/state/{loanId}/{state}")
+    public ResponseEntity<String> changeLoanState(@PathVariable String loanId, @PathVariable State state){
+        loanService.changeLoanState(loanId,state);
+        return ResponseEntity.ok("Estado actualizado correctamente");
     }
 
 }
