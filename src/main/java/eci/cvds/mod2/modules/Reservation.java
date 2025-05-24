@@ -44,9 +44,6 @@ public class Reservation {
     @Schema(description = "ID único de la Sala donde es la reserva", example = "64sdfsdfacb01j2000154d4")
     private String roomId;
 
-    @Builder.Default
-    @Schema(description = "Prestamos que se han hecho en la reserva")
-    private Set<String> loans = new HashSet<>();
 
     @Setter
     @Schema(description = "Estado de la reserva", example = "RESERVA_CONFIRMADA")
@@ -56,22 +53,5 @@ public class Reservation {
     @Schema(description = "Cantidad de personas que van a la reserva", example = "5")
     private int people;
 
-    public void addLoan(String loanId) {
-        if (loans == null) {
-            this.loans = new HashSet<>();
-        }
-        this.loans.add(loanId);
-    }
-    public void setLoans(Set<String> loans) {
-        if (loans == null) {
-            this.loans = new HashSet<>();
-        } else {
-            this.loans = new HashSet<>(loans);
-        }
-    }
-
-    public Set<String> getLoans() {
-        return Collections.unmodifiableSet(loans != null ? loans : new HashSet<>());
-    }
 
 }

@@ -31,4 +31,8 @@ public class Loan {
     @NotNull
     @Schema(description = "Estado del préstamo", example = "PRESTAMO_DEVUELTO")
     State state;
+    @Setter
+    @NotNull
+    @Schema(description = "Reserva a la que pertenece el prestamo", example = "66396e1a19e7b3038c7be552")
+    String revId;
 }

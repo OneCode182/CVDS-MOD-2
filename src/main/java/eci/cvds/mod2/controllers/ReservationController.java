@@ -228,21 +228,4 @@ public class ReservationController {
         return reservationService.getAll();
     }
 
-    @Operation(
-            summary = "Agregar un préstamo a una reserva",
-            description = "Agrega un préstamo a una reserva dado su ID.",
-            parameters = {
-                    @Parameter(name = "revId", description = "ID de la reserva", required = true, example = "642b7f1d0001fae3d4"),
-                    @Parameter(name = "loanId", description = "ID del préstamo", required = true, example = "642b1312f01fae3d4")
-            },
-            responses = {
-                    @ApiResponse(responseCode = "200"),
-                    @ApiResponse(responseCode = "404", description = "Reservation not found"),
-                    @ApiResponse(responseCode = "404", description = "The searched loan was not found")
-            }
-    )
-    @PutMapping("/{revId}/{loanId}")
-    public ResponseEntity<Reservation> addLoan(@PathVariable String revId,@PathVariable String loanId){
-        return ResponseEntity.ok(reservationService.addLoan(revId,loanId));
-    }
 }

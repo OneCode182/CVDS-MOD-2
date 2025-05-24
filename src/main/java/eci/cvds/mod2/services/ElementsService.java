@@ -2,7 +2,10 @@ package eci.cvds.mod2.services;
 
 import eci.cvds.mod2.exceptions.ElementException;
 import eci.cvds.mod2.exceptions.ElementNotFoundException;
+import eci.cvds.mod2.exceptions.RoomException;
+import eci.cvds.mod2.exceptions.RoomNotFoundException;
 import eci.cvds.mod2.modules.RecreationalElement;
+import eci.cvds.mod2.modules.Room;
 import eci.cvds.mod2.reposistories.ElementsRepo;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +56,18 @@ public class ElementsService {
         element.setQuantity(newElement.getQuantity());
         element.setDescription(newElement.getDescription());
         return elementsRepo.save(element);
+    }
+    public void reduceElementQuantity(String elementId, int loanNumber){
+        RecreationalElement element = elementsRepo.findById(elementId)
+                .orElseThrow(()-> new ElementNotFoundException(ElementException.ELEMENT_NOT_FOUND));
+        element.reduceCapacity(loanNumber);
+        elementsRepo.save(element);
+    }
+    public void increaseElementQuantity(String elementId, int loanNumber){
+        RecreationalElement element = elementsRepo.findById(elementId)
+                .orElseThrow(()-> new ElementNotFoundException(ElementException.ELEMENT_NOT_FOUND));
+        element.increaseCapacity(loanNumber);
+        elementsRepo.save(element);
     }
     public List<RecreationalElement> getAll(){
         return elementsRepo.findAll();
