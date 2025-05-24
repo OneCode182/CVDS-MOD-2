@@ -159,5 +159,8 @@ public class ReservationService {
     public List<Reservation> getAll() {
         return reservationRepo.findAll();
     }
-
+    public List<Reservation> getReservationByTokenUser(){
+        CustomUserDetails user = getCurrentUser();
+        return getReservationsByUserId(user.getId());
+    }
 }

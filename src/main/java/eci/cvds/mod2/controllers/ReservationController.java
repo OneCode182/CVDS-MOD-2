@@ -227,5 +227,8 @@ public class ReservationController {
     public List<Reservation> getAll() {
         return reservationService.getAll();
     }
-
+    @GetMapping("/user")
+    public List<Reservation> getReservationsByTokenUser(){
+        return reservationService.getReservationByTokenUser();
+    }
 }
