@@ -27,8 +27,9 @@ import java.util.Stack;
 @Service
 public class ReservationService {
     private final ReservationRepo reservationRepo;
-    private final RoomController roomController;
+
     private final IEmailService emailService;
+    final RoomsService roomsService;
     private CustomUserDetails getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return (CustomUserDetails) auth.getPrincipal();
@@ -36,19 +37,12 @@ public class ReservationService {
 
 
     @Autowired
-    public ReservationService(ReservationRepo reservationRepo, RoomController roomController, IEmailService emailService){
+    public ReservationService(ReservationRepo reservationRepo, IEmailService emailService, RoomsService roomsService){
         this.reservationRepo = reservationRepo;
-        this.roomController = roomController;
         this.emailService=emailService;
+        this.roomsService = roomsService;
     }
-    private void checkAdminOrAdminstrativoRole() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
-        Role role = Role.fromString(user.getRole());
-        if (!(role.equals(Role.SALA_ADMIN))) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para realizar esta acción");
-        }
-    }
+
     public List<Reservation> getReservationsByUserId(String userId) {
         List<Reservation> reservations = reservationRepo.findReservationByUserId(userId);
         if (reservations.isEmpty()) {
@@ -57,10 +51,6 @@ public class ReservationService {
         return reservations;
     }
 
-
-    public List<Reservation> getReservationsByUserRole(Role role) {
-        return null;
-    }
 
     public Reservation getReservationById(String revId) {
         return reservationRepo.findById(revId).
@@ -95,9 +85,6 @@ public class ReservationService {
     }
 
     public Reservation createReservation(Reservation rev) {
-//        if (!Date.checkValidDate(rev.getDate())) {
-//            throw new ReservationNotFoundException(ReservationException.NOT_VALID_DATE_OF_RESERVATION);
-//        }
         CustomUserDetails user = getCurrentUser();
         rev.setUserId(user.getId());
         rev.setUserName(user.getName());
@@ -105,7 +92,7 @@ public class ReservationService {
         if (reservationRepo.findReservationByRoomIdAndDateAndUserId(rev.getRoomId(), rev.getDate(), rev.getUserId()).isPresent()) {
             throw new ReservationNotFoundException(ReservationException.REV_ALREADY_EXIST);
         }
-        roomController.reduceCapacityOfRoom(rev.getRoomId(), rev.getPeople());
+        roomsService.reduceCapacityOfRoom(rev.getRoomId(), rev.getPeople());
         Reservation savedReservation = reservationRepo.save(rev);
 
         String[] to = {"santiago.amador-d@mail.escuelaing.edu.co"};
@@ -126,7 +113,7 @@ public class ReservationService {
     public Reservation updateReservation(String revId, Reservation newRev) {
         Reservation reservation = reservationRepo.findById(revId)
                 .orElseThrow(()-> new ReservationNotFoundException(ReservationException.REV_NOT_FOUND));
-        roomController.getRoomById(newRev.getRoomId());
+        roomsService.getRoomByRoomId(newRev.getRoomId());
 
         reservation.setDate(newRev.getDate());
         reservation.setRoomId(newRev.getRoomId());
@@ -138,9 +125,9 @@ public class ReservationService {
 
     public Reservation deleteReservation(String revId) {
         Reservation reservation = reservationRepo.findById(revId)
-                .orElseThrow(()-> new RoomNotFoundException(RoomException.ROOM_NOT_FOUND));
+                .orElseThrow(()-> new ReservationNotFoundException(ReservationException.REV_NOT_FOUND));
         reservationRepo.deleteById(revId);
-        roomController.increaseCapacityOfRoom(reservation.getRoomId(), reservation.getPeople());
+        roomsService.increaseCapacityOfRoom(reservation.getRoomId(), reservation.getPeople());
         return reservation;
     }
     public void changeReservationState(String revId, State state){
@@ -152,7 +139,7 @@ public class ReservationService {
         }
         reservation.setState(state);
         if(state.equals(State.RESERVA_CANCELADA)|| state.equals(State.RESERVA_TERMINADA)){
-            roomController.increaseCapacityOfRoom(reservation.getRoomId(), reservation.getPeople());
+            roomsService.increaseCapacityOfRoom(reservation.getRoomId(), reservation.getPeople());
         }
         reservationRepo.save(reservation);
     }

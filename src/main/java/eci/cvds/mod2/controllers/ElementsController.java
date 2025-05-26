@@ -99,9 +99,7 @@ public class ElementsController {
     )
     @DeleteMapping("/{elementId}")
     public ResponseEntity<String> deleteElement(@PathVariable String elementId) {
-        // Verifica si el elemento existe llamando a getElementById
-        elementsService.getElementById(elementId);  // Esto asegura que el elemento se obtenga antes de intentar eliminarlo.
-
+        elementsService.getElementById(elementId);
         elementsService.deleteElement(elementId);
         return ResponseEntity.ok("Element successfully deleted");
     }
@@ -139,8 +137,8 @@ public class ElementsController {
         return elementsService.getAll();
     }
     @PutMapping("/reduce/{elementId}")
-    public ResponseEntity<String> reduceElementQuantity(@PathVariable String elementId, int loanNumber){
-        elementsService.reduceElementQuantity(elementId, loanNumber);
+    public ResponseEntity<String> reduceElementQuantity(@PathVariable String elementId){
+        elementsService.reduceElementQuantity(elementId, 1);
         return ResponseEntity.ok("The capacity was successfully reduced");
     }
     @Operation(summary = "Aumentar la capacidad de una sala")
@@ -150,8 +148,8 @@ public class ElementsController {
             @ApiResponse(responseCode = "404", description = "The room searched was not found")
     })
     @PutMapping("/increase/{elementId}")
-    public ResponseEntity<String> increaseElementQuantity(@PathVariable String elementId, int loanNumber){
-        elementsService.increaseElementQuantity(elementId, loanNumber);
+    public ResponseEntity<String> increaseElementQuantity(@PathVariable String elementId){
+        elementsService.increaseElementQuantity(elementId, 1);
         return ResponseEntity.ok("The capacity was successfully increased");
     }
 }
