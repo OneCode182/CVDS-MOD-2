@@ -49,24 +49,6 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.getReservationsByUserId(userId));
     }
 
-
-    @Operation(
-            summary = "Obtener reservas por roles en ellas",
-            description = "Retorna reservas dado un rol.",
-            parameters = {
-                    @Parameter(name = "role", description = "Roles en las reservas", required = true, example = "rol")
-            },
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Elementos encontrados",
-                            content = @Content(schema = @Schema(implementation = Reservation.class)))
-            }
-    )
-    @GetMapping("/role/{role}")
-    public List<Reservation> getReservationsByUserRole(@PathVariable Role role) {
-        return reservationService.getReservationsByUserRole(role);
-    }
-
-
     @Operation(
             summary = "Obtener reserva por ID",
             description = "Retorna una reserva dado su identificador.",
@@ -97,7 +79,7 @@ public class ReservationController {
                     @ApiResponse(responseCode = "404", description = "There are no reservations the requested day and hour")
             }
     )
-    @GetMapping("/date")
+    @PostMapping("/date")
     public ResponseEntity<List<Reservation>> getReservationsByDay(@RequestBody Date date) {
         return ResponseEntity.ok(reservationService.getReservationsByDay(date));
     }

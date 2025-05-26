@@ -1,217 +1,187 @@
 package eci.cvds.mod2.controllers;
 
-import eci.cvds.mod2.exceptions.LoanException;
-import eci.cvds.mod2.exceptions.LoanNotFoundException;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eci.cvds.mod2.exceptions.*;
 import eci.cvds.mod2.modules.Loan;
-import eci.cvds.mod2.reposistories.LoanRepo;
+import eci.cvds.mod2.services.ElementsService;
 import eci.cvds.mod2.services.LoanService;
+import eci.cvds.mod2.util.GlobalExceptionHandler;
 import eci.cvds.mod2.util.State;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+
 import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
-import java.util.Arrays;
+import org.springframework.web.server.ResponseStatusException;
+
+
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.*;
+
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-class LoanServiceTest {
-//
-//    @Mock
-//    private LoanRepo loanRepo;
-//    @InjectMocks
-//    private LoanService loanService;
-//    private Loan sampleLoan;
-//    @Mock
-//    private ElementsController elementsController;
-//    @BeforeEach
-//    void setUp() {
-//        MockitoAnnotations.openMocks(this);
-//        sampleLoan = new Loan("1", "element123", State.PRESTAMO_PENDIENTE, "reserva123");
-//    }
-//
-//    @Test
-//    void shouldCreateLoan() {
-//        when(elementsController.getElementById("element123")).thenReturn(null);
-//        when(loanRepo.save(any(Loan.class))).thenReturn(sampleLoan);
-//        Loan created = loanService.createLoan(sampleLoan);
-//        assertEquals("element123", created.getElementId());
-//        assertEquals(State.PRESTAMO_PENDIENTE, created.getState());
-//    }
-//
-//    @Test
-//    void shouldThrowExceptionWhenLoanCreationFails() {
-//        when(elementsController.getElementById("element123")).thenReturn(null);
-//        when(loanRepo.save(any(Loan.class))).thenThrow(new RuntimeException("Database error"));
-//        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-//            loanService.createLoan(sampleLoan);
-//        });
-//        assertEquals("Database error", exception.getMessage());
-//    }
-//
-//    @Test
-//    void shouldReturnLoanById() {
-//        when(loanRepo.findById("1")).thenReturn(Optional.of(sampleLoan));
-//        Loan found = loanService.getLoanById("1");
-//        assertEquals("element123", found.getElementId());
-//    }
-//
-//    @Test
-//    void shouldThrowExceptionWhenLoanByIdNotFound() {
-//        when(loanRepo.findById("999")).thenReturn(Optional.empty());
-//        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-//            loanService.getLoanById("999");
-//        });
-//        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-//    }
-//
-//    @Test
-//    void shouldReturnLoansByState() {
-//        when(loanRepo.findByState(State.PRESTAMO_PENDIENTE)).thenReturn(Arrays.asList(sampleLoan));
-//        List<Loan> result = loanService.getLoansByState(State.PRESTAMO_PENDIENTE);
-//        assertEquals(1, result.size());
-//        assertEquals(State.PRESTAMO_PENDIENTE, result.get(0).getState());
-//    }
-//
-//    @Test
-//    void shouldThrowExceptionWhenNoLoansFoundByState() {
-//        when(loanRepo.findByState(State.PRESTAMO_PENDIENTE)).thenReturn(Arrays.asList());
-//        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-//            loanService.getLoansByState(State.PRESTAMO_PENDIENTE);
-//        });
-//        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-//        assertTrue(exception.getReason().contains("No loans found for state"));
-//    }
-//
-//    @Test
-//    void shouldUpdateLoan() {
-//        Loan updatedLoan = new Loan(null, "element999", State.PRESTAMO_DEVUELTO, "reserva234");
-//        when(loanRepo.findById("1")).thenReturn(Optional.of(sampleLoan));
-//        when(elementsController.getElementById("element999")).thenReturn(null);
-//        when(loanRepo.save(any(Loan.class))).thenAnswer(i -> i.getArgument(0));
-//        Loan result = loanService.updateLoan("1", updatedLoan);
-//        assertEquals("element999", result.getElementId());
-//        assertEquals(State.PRESTAMO_DEVUELTO, result.getState());
-//    }
-//
-//    @Test
-//    void shouldDeleteLoan() {
-//        when(loanRepo.findById("1")).thenReturn(Optional.of(sampleLoan));
-//        doNothing().when(loanRepo).deleteById("1");
-//        Loan deleted = loanService.deleteLoan("1");
-//        assertEquals("1", deleted.getId());
-//        verify(loanRepo).deleteById("1");
-//    }
-//
-//    @Test
-//    void shouldThrowExceptionWhenLoanNotFoundForDeletion() {
-//        when(loanRepo.findById("1")).thenReturn(Optional.empty());
-//        LoanNotFoundException exception = assertThrows(LoanNotFoundException.class, () -> {
-//            loanService.deleteLoan("1");
-//        });
-//        assertTrue(exception.getMessage().contains("Loan not found"));
-//        verify(loanRepo, times(0)).deleteById("1");
-//    }
-//
-//    @Test
-//    void shouldThrowWhenLoanNotFound() {
-//        when(loanRepo.findById("999")).thenReturn(Optional.empty());
-//        assertThrows(ResponseStatusException.class, () -> {
-//            loanService.getLoanById("999");
-//        });
-//    }
-//
-//    @Test
-//    void shouldNotCreateLoanWithNullElementId() {
-//        Loan invalidLoan = new Loan("2", null, State.PRESTAMO_PENDIENTE, "reserva");
-//        when(loanRepo.save(any(Loan.class))).thenThrow(new IllegalArgumentException("elementId is required"));
-//        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-//            loanService.createLoan(invalidLoan);
-//        });
-//        assertEquals("elementId is required", exception.getMessage());
-//    }
-//
-//    @Test
-//    void shouldNotCreateLoanWithInvalidState() {
-//        Loan invalidLoan = new Loan("2", "element456", null, "reserva098");
-//        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-//            loanService.createLoan(invalidLoan);
-//        });
-//        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
-//        assertTrue(exception.getReason().contains("Invalid state value"));
-//    }
-//
-//    @Test
-//    void shouldNotUpdateNonExistentLoan() {
-//        Loan update = new Loan("2", "element456", State.PRESTAMO_DEVUELTO, "rev123");
-//        when(loanRepo.findById("2")).thenReturn(Optional.empty());
-//        LoanNotFoundException exception = assertThrows(LoanNotFoundException.class, () -> {
-//            loanService.updateLoan("2", update);
-//        });
-//        assertEquals(LoanException.LOAN_NOT_FOUND, exception.getMessage());
-//    }
-//
-//    @Test
-//    void shouldChangeStateToDamageLoanOnReturn() {
-//        Loan damagedLoan = new Loan("3", "element999", State.DAMAGE_LOAN,"rev098");
-//        when(loanRepo.findById("3")).thenReturn(Optional.of(damagedLoan));
-//        when(loanRepo.save(any(Loan.class))).thenAnswer(invocation -> invocation.getArgument(0));
-//        Loan result = loanService.updateLoan("3", damagedLoan);
-//        assertEquals(State.DAMAGE_LOAN, result.getState());
-//    }
-//
-//    @Test
-//    void shouldFailIfDeletingLoanWithNonExistentId() {
-//        String nonExistentLoanId = "999"; // ID de tipo String que no existe en la base de datos
-//        LoanNotFoundException exception = assertThrows(LoanNotFoundException.class, () -> {
-//            loanService.deleteLoan(nonExistentLoanId);
-//        });
-//        assertEquals("Loan not found", exception.getMessage());
-//        verify(loanRepo, times(1)).findById(nonExistentLoanId); // Verificar la llamada al repositorio
-//        verify(loanRepo, times(0)).deleteById(nonExistentLoanId); // No debe haberse llamado al método delete
-//    }
-//
-//
-//
-//    @Test
-//    void shouldThrowExceptionIfElementDoesNotExistOnCreate() {
-//        // Should throw if the element ID is not found during creation
-//        Loan loanWithInvalidElement = new Loan("4", "element404", State.PRESTAMO_PENDIENTE,"rev14");
-//        when(elementsController.getElementById("element404")).thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Element not found"));
-//        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-//            loanService.createLoan(loanWithInvalidElement);
-//        });
-//        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-//        assertTrue(exception.getReason().contains("Element not found"));
-//    }
-//
-//    @Test
-//    void shouldThrowExceptionIfElementDoesNotExistOnUpdate() {
-//        // Should throw if the new element ID is invalid during update
-//        Loan updatedLoan = new Loan("1", "nonexistentElement", State.PRESTAMO_PENDIENTE, "rev123");
-//        when(loanRepo.findById("1")).thenReturn(Optional.of(sampleLoan));
-//        when(elementsController.getElementById("nonexistentElement")).thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Element not found"));
-//        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-//            loanService.updateLoan("1", updatedLoan);
-//        });
-//        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-//    }
-//    @Test
-//    void shouldAllowUpdateLoanWithNullElementIdIfNoValidationExists() {
-//        // Arrange
-//        when(loanRepo.findById("1")).thenReturn(Optional.of(sampleLoan));
-//        Loan update = new Loan("1", null, State.PRESTAMO_DEVUELTO, "rev123");
-//        when(loanRepo.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-//
-//        // Act
-//        Loan result = loanService.updateLoan("1", update);
-//
-//        // Assert
-//        assertNull(result.getElementId());
-//        assertEquals(State.PRESTAMO_DEVUELTO, result.getState());
-//    }
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
+@WebMvcTest(LoanControllerTest.class)
+class LoanControllerTest {
+
+    @Mock
+    private LoanService loanService;
+    @InjectMocks
+    private LoanController loanController;
+    private Loan sampleLoan;
+    @Mock
+    private ElementsService elementsService;
+    @Autowired
+    private MockMvc mockMvc;
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        sampleLoan = new Loan("1", "element123", State.PRESTAMO_PENDIENTE, "reserva123");
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(loanController)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
+    }
+    @Test
+    void shouldReturn200WhenGettingLoanWithId() throws  Exception{
+        when(loanService.getLoanById("1")).thenReturn(sampleLoan);
+        mockMvc.perform(get("/loans/id/1")).andExpect(status().isOk());
+    }
+    @Test
+    void shouldReturn404WhenGettingNonExistingLoanWithId() throws Exception{
+        when(loanService.getLoanById("11"))
+                .thenThrow( new LoanNotFoundException(LoanException.LOAN_NOT_FOUND));
+        mockMvc.perform(get("/loans/id/11")).andExpect(status().isNotFound());
+    }
+    @Test
+    void shouldReturn200WhenGettingLoansWithState() throws  Exception{
+        List<Loan> loans = Collections.singletonList(sampleLoan);
+        when(loanService.getLoansByState(State.PRESTAMO_PENDIENTE)).thenReturn(loans);
+        mockMvc.perform(get("/loans/state/PRESTAMO_PENDIENTE")).andExpect(status().isOk());
+    }
+    @Test
+    void shouldReturn404WhenGettingNonExistingLoanWithThatState() throws Exception{
+        State state = State.PRESTAMO_DEVUELTO;
+        when(loanService.getLoansByState(State.PRESTAMO_DEVUELTO))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "No loans found for state: " + state));
+        mockMvc.perform(get("/loans/state/PRESTAMO_DEVUELTO")).andExpect(status().isNotFound());
+    }
+    @Test
+    void shouldReturn201WhenCorrectCreationOfLoan() throws Exception {
+        Loan loan = new Loan("12","123",State.PRESTAMO_PENDIENTE,"321");
+        when(loanService.createLoan(any(Loan.class))).thenReturn(loan);
+        mockMvc.perform(post("/loans")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(loan)))
+                .andExpect(status().isCreated())
+                .andExpect(content().string("Loan successfully created"));
+        verify(loanService).createLoan(any(Loan.class));
+    }
+    @Test
+    void shouldReturn400WhenCreatingALoanWithANonValidState() throws Exception{
+        Loan loan = mock(Loan.class);
+        when(loan.getState()).thenReturn(null);
+        when(loanService.createLoan(any(Loan.class)))
+                .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid state value"));
+        mockMvc.perform(post("/loans")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(loan)))
+                .andExpect(status().isBadRequest());
+        verify(loanService).createLoan(any(Loan.class));
+    }
+    @Test
+    void shouldReturn404WhenCreatingALoanWithNonExistingElement() throws Exception {
+        Loan loan = mock(Loan.class);
+        when(elementsService.getElementById(loan.getId()))
+                .thenThrow(new ElementNotFoundException(ElementException.ELEMENT_NOT_FOUND));
+        when(loanService.createLoan(any(Loan.class)))
+                .thenThrow(new ElementNotFoundException(ElementException.ELEMENT_NOT_FOUND));
+        mockMvc.perform(post("/loans")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(loan)))
+                .andExpect(status().isNotFound());
+        verify(loanService).createLoan(any(Loan.class));
+    }
+    @Test
+    void shouldReturn404WhenCreatingALoanWithNonExistingReservation() throws Exception {
+        Loan loan = mock(Loan.class);
+
+        when(loanService.createLoan(any(Loan.class)))
+                .thenThrow(new ReservationNotFoundException(ReservationException.REV_NOT_FOUND));
+        mockMvc.perform(post("/loans")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(loan)))
+                .andExpect(status().isNotFound());
+        verify(loanService).createLoan(any(Loan.class));
+    }
+    @Test
+    void shouldReturn200WhenUpdatingLoan() throws Exception {
+        when (loanService.updateLoan(eq("1"),any(Loan.class))).thenReturn(sampleLoan);
+        mockMvc.perform(put("/loans/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(sampleLoan)))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Loan successfully updated "));
+        verify(loanService).updateLoan(eq("1"),any(Loan.class));
+    }
+    @Test
+    void shouldReturn404WhenUpdatingNotExistentLoan() throws Exception {
+        when(loanService.updateLoan(eq("1"),any(Loan.class)))
+                .thenThrow(new LoanNotFoundException(LoanException.LOAN_NOT_FOUND));
+        mockMvc.perform(put("/loans/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(sampleLoan)))
+                .andExpect(status().isNotFound());
+        verify(loanService).updateLoan(eq("1"),any(Loan.class));
+    }
+    @Test
+    void shouldReturn404WhenUpdatingLoanWithNonExistentElement() throws Exception {
+        when(loanService.updateLoan(eq("1"),any(Loan.class)))
+                .thenThrow(new ElementNotFoundException(ElementException.ELEMENT_NOT_FOUND));
+        mockMvc.perform(put("/loans/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(sampleLoan)))
+                .andExpect(status().isNotFound());
+        verify(loanService).updateLoan(eq("1"),any(Loan.class));
+    }
+    @Test
+    void shouldReturn404WhenUpdatingLoanWithNonExistentReservation() throws Exception {
+        when(loanService.updateLoan(eq("1"),any(Loan.class)))
+                .thenThrow(new ReservationNotFoundException(ReservationException.REV_NOT_FOUND));
+        mockMvc.perform(put("/loans/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(sampleLoan)))
+                .andExpect(status().isNotFound());
+        verify(loanService).updateLoan(eq("1"),any(Loan.class));
+    }
+    @Test
+    void shouldReturn200WhenDeletingElement() throws Exception {
+        when(loanService.deleteLoan("1")).thenReturn(sampleLoan);
+        mockMvc.perform(delete("/loans/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Loan successfully deleted"));
+        verify(loanService).deleteLoan("1");
+    }
+    @Test
+    void shouldReturn200WhenGettingAllElements() throws Exception{
+        List<Loan> loans = Collections.singletonList(sampleLoan);
+        when(loanService.getAll()).thenReturn(loans);
+        mockMvc.perform(get("/loans")).andExpect(status().isOk());
+    }
+    @Test
+    void shouldReturn200WhenChangingALoanStatus() throws Exception{
+        doNothing().when(loanService).changeLoanState("1",State.PRESTAMO_PENDIENTE);
+        mockMvc.perform(put("/loans/state/1/PRESTAMO_PENDIENTE")).andExpect(status().isOk());
+    }
 
 }

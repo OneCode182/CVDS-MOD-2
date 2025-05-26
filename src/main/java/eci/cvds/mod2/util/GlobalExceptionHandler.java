@@ -1,9 +1,6 @@
 package eci.cvds.mod2.util;
 
-import eci.cvds.mod2.exceptions.ElementException;
-import eci.cvds.mod2.exceptions.ElementNotFoundException;
-import eci.cvds.mod2.exceptions.LoanNotFoundException;
-import eci.cvds.mod2.exceptions.ReservationNotFoundException;
+import eci.cvds.mod2.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -35,5 +32,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleElementNotFound(ReservationNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
+    @ExceptionHandler(RoomNotFoundException.class)
+    public ResponseEntity<String> handleElementNotFound(RoomNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+    @ExceptionHandler(RoomAlreadyExistException.class)
+    public ResponseEntity<String> handleElementNotFound(RoomAlreadyExistException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
 }
 

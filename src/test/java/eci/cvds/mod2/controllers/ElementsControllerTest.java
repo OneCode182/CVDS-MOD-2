@@ -1,24 +1,36 @@
 package eci.cvds.mod2.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eci.cvds.mod2.exceptions.ElementException;
 import eci.cvds.mod2.exceptions.ElementNotFoundException;
 import eci.cvds.mod2.modules.RecreationalElement;
 import eci.cvds.mod2.services.ElementsService;
+import eci.cvds.mod2.util.GlobalExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
+import org.springframework.http.MediaType;
+
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+
+
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class ElementsControllerTest {
+@WebMvcTest(ElementsControllerTest.class)
+class ElementsControllerTest {
 
     @InjectMocks
     private ElementsController elementsController;
@@ -27,141 +39,132 @@ public class ElementsControllerTest {
     private ElementsService elementsService;
 
     private RecreationalElement element;
+    @Autowired
+    private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         element = new RecreationalElement("1", "Ball", 10, "A round ball");
-        //element = new RecreationalElement();
+            mockMvc = MockMvcBuilders
+                    .standaloneSetup(elementsController)
+                    .setControllerAdvice(new GlobalExceptionHandler())
+                    .build();
     }
 
     @Test
-    void shouldGetElementById_Success() {
-        // Arrange
+    void shouldReturn200WhenGettingElementWithId() throws  Exception{
         when(elementsService.getElementById("1")).thenReturn(element);
-
-        // Act
-        ResponseEntity<RecreationalElement> response = elementsController.getElementById("1");
-
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(element, response.getBody());
-        verify(elementsService, times(1)).getElementById("1");
+        mockMvc.perform(get("/elements/id/1")).andExpect(status().isOk());
     }
-
     @Test
-    void shouldThrowExceptionWhenElementNotFound() {
-        // Arrange: Simulamos que no se encuentra el elemento
-        when(elementsService.getElementById("999")).thenThrow(new ElementNotFoundException(ElementException.ELEMENT_NOT_FOUND));
-
-        // Act y Assert: Verificamos que se lanza una ElementNotFoundException cuando no se encuentra el elemento
-        ElementNotFoundException exception = assertThrows(ElementNotFoundException.class, () -> {
-            elementsController.getElementById("999");
-        });
-
-        // Verificamos el mensaje de la excepción
-        assertTrue(exception.getMessage().contains(ElementException.ELEMENT_NOT_FOUND));
+    void shouldReturn404WhenGettingNonExistingElementWithId() throws Exception{
+        when(elementsService.getElementById("11"))
+                .thenThrow( new ElementNotFoundException(ElementException.ELEMENT_NOT_FOUND));
+        mockMvc.perform(get("/elements/id/11")).andExpect(status().isNotFound());
     }
-
-
     @Test
-    void shouldCreateElement() {
-        // Arrange
-        when(elementsService.createElement(any(RecreationalElement.class))).thenReturn(element);
-
-        // Act
-        ResponseEntity<String> response = elementsController.createElement(element);
-
-        // Assert
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals("Element successfully created", response.getBody());
-        verify(elementsService, times(1)).createElement(any(RecreationalElement.class));
-    }
-
-    @Test
-    void shouldGetElementByName_Success() {
-        // Arrange: Crear un RecreationalElement para simular la respuesta del servicio
-        RecreationalElement element = new RecreationalElement("1", "Ball", 10, "A round ball");
-
-        // Simula la respuesta del servicio cuando se solicita un elemento por nombre
+    void shouldReturn200WhenGettingElementWithName() throws  Exception{
         when(elementsService.getElementByName("Ball")).thenReturn(element);
-
-        // Act: Llamamos al método del controlador
-        ResponseEntity<RecreationalElement> response = elementsController.getElementByName("Ball");
-
-        // Assert: Verificamos que el código de estado sea OK (200)
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-
-        // Verificamos que el cuerpo de la respuesta contenga el elemento esperado
-        assertEquals(element, response.getBody());
-
-        // Verificamos que el servicio haya sido llamado una vez con el nombre "Ball"
-        verify(elementsService, times(1)).getElementByName("Ball");
+        mockMvc.perform(get("/elements/name/Ball")).andExpect(status().isOk());
     }
-
-
-
     @Test
-    void shouldDeleteElement() {
-        // Arrange: Crear un objeto de RecreationalElement para simular su existencia
-        RecreationalElement elementToDelete = new RecreationalElement("1", "Ball", 10, "Description");
-
-        // Simula la búsqueda del elemento con ID "1" en el repositorio
-        when(elementsService.getElementById("1")).thenReturn(elementToDelete);
-
-        // Simula la eliminación del elemento
-        when(elementsService.deleteElement("1")).thenReturn(elementToDelete);
-
-        // Act: Llamamos al método de eliminación en el controlador
-        ResponseEntity<String> response = elementsController.deleteElement("1");
-
-        // Assert: Verificamos que la respuesta sea la esperada
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Element successfully deleted", response.getBody());
-
-        // Verificamos que getElementById y deleteElement se llamaron correctamente
-        verify(elementsService, times(1)).getElementById("1");  // Verifica que getElementById fue llamado
-        verify(elementsService, times(1)).deleteElement("1");  // Verifica que deleteElement fue llamado
+    void shouldReturn404WhenGettingNonExistingElementWithName() throws Exception{
+        when(elementsService.getElementByName("Ball"))
+                .thenThrow( new ElementNotFoundException(ElementException.ELEMENT_NOT_FOUND));
+        mockMvc.perform(get("/elements/name/Ball")).andExpect(status().isNotFound());
     }
-
-
-
-
     @Test
-    void shouldUpdateElement() {
-        // Arrange: Crear un nuevo elemento con datos actualizados
-        RecreationalElement updatedElement = new RecreationalElement("1","Updated Ball", 15, "Updated description");
-
-        // Simula la búsqueda del elemento original
-        when(elementsService.getElementById("1")).thenReturn(new RecreationalElement("1", "Ball", 10, "Old description"));
-
-        // Simula la acción de guardar el elemento actualizado
-        when(elementsService.updateElement(eq("1"), any(RecreationalElement.class))).thenReturn(updatedElement);
-
-        // Act: Llamamos al método de actualización
-        ResponseEntity<String> response = elementsController.updateElement("1", updatedElement);
-
-        // Assert: Verificamos que la respuesta es correcta
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Element successfully updated", response.getBody());
-
-        // Verificamos que el método de actualización se haya llamado una vez
-        verify(elementsService, times(1)).updateElement(eq("1"), any(RecreationalElement.class));
+    void shouldReturn201WhenCorrectCreationOfElement() throws Exception {
+        RecreationalElement element1 = new RecreationalElement("2", "Jenga", 1, "fun game");
+        when(elementsService.createElement(any(RecreationalElement.class))).thenReturn(element1);
+        mockMvc.perform(post("/elements")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(element1)))
+                .andExpect(status().isCreated())
+                .andExpect(content().string("Element successfully created"));
+        verify(elementsService).createElement(any(RecreationalElement.class));
     }
-
-
     @Test
-    void testGetAllElements() {
-        // Arrange
-        when(elementsService.getAll()).thenReturn(List.of(element));
-
-        // Act
-        List<RecreationalElement> elements = elementsController.getAll();
-
-        // Assert
-        assertNotNull(elements);
-        assertEquals(1, elements.size());
-        assertEquals(element, elements.get(0));
-        verify(elementsService, times(1)).getAll();
+    void shouldReturn201WhenCreatingAExistingElement() throws Exception{
+        RecreationalElement element1 = new RecreationalElement("1", "Ball", 10, "A round ball");
+        when(elementsService.createElement(any(RecreationalElement.class))).thenReturn(element1);
+        mockMvc.perform(post("/elements")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(element1)))
+                .andExpect(status().isCreated())
+                .andExpect(content().string("Element successfully created"));
+        verify(elementsService).createElement(any(RecreationalElement.class));
     }
+    @Test
+    void shouldReturn200WhenDeletingElement() throws Exception {
+        when(elementsService.deleteElement("1")).thenReturn(element);
+        mockMvc.perform(delete("/elements/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Element successfully deleted"));
+        verify(elementsService).deleteElement("1");
+    }
+    @Test
+    void shouldReturn400WhenDeletingNonExistentElement() throws Exception {
+        when(elementsService.deleteElement("1"))
+                .thenThrow(new ElementNotFoundException(ElementException.ELEMENT_NOT_FOUND));
+        mockMvc.perform(delete("/elements/1"))
+                .andExpect(status().isNotFound());
+        verify(elementsService).deleteElement("1");
+    }
+    @Test
+    void shouldReturn200WhenUpdatingLab() throws Exception {
+        when (elementsService.updateElement(eq("1"),any(RecreationalElement.class))).thenReturn(element);
+        mockMvc.perform(put("/elements/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(element)))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Element successfully updated"));
+        verify(elementsService).updateElement(eq("1"),any(RecreationalElement.class));
+    }
+    @Test
+    void shouldReturn404WhenUpdatingNotExistentLab() throws Exception {
+        when(elementsService.updateElement(eq("1"),any(RecreationalElement.class)))
+                .thenThrow(new ElementNotFoundException(ElementException.ELEMENT_NOT_FOUND));
+        mockMvc.perform(put("/elements/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(element)))
+                .andExpect(status().isNotFound());
+        verify(elementsService).updateElement(eq("1"),any(RecreationalElement.class));
+    }
+    @Test
+    void shouldReturn200WhenGettingAllElements() throws Exception{
+        List<RecreationalElement> elements = Collections.singletonList(element);
+        when(elementsService.getAll()).thenReturn(elements);
+        mockMvc.perform(get("/elements")).andExpect(status().isOk());
+    }
+    @Test
+    void shouldReturn200WhenReducingElementQuantity() throws Exception {
+        doNothing().when(elementsService).reduceElementQuantity("1", 1);
+
+        mockMvc.perform(put("/elements/reduce/1"))
+                .andExpect(status().isOk());
+    }
+    @Test
+    void shouldReturn404WhenReducingTheQuantityOfANonExistingElement() throws Exception{
+        doThrow(new ElementNotFoundException(ElementException.ELEMENT_NOT_FOUND))
+                .when(elementsService).reduceElementQuantity("1",1);
+        mockMvc.perform(put("/elements/reduce/1"))
+                .andExpect(status().isNotFound());
+    }
+    @Test
+    void shouldReturn200WhenIncreasingElementQuantity() throws Exception {
+        doNothing().when(elementsService).increaseElementQuantity("1", 1);
+
+        mockMvc.perform(put("/elements/increase/1"))
+                .andExpect(status().isOk());
+    }
+    @Test
+    void shouldReturn404WhenIncreasingTheQuantityOfANonExistingElement() throws Exception{
+        doThrow(new ElementNotFoundException(ElementException.ELEMENT_NOT_FOUND))
+                .when(elementsService).increaseElementQuantity("1",1);
+        mockMvc.perform(put("/elements/increase/1"))
+                .andExpect(status().isNotFound());
+    }
+
 }

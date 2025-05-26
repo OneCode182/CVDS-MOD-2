@@ -33,10 +33,11 @@ public class Room {
     int capacity;
     private Set<String> elementList = new HashSet<>();
 
-    public void removeElement(String elementId){
-        if (!elementList.remove(elementId)) {
+    public void removeElement(String elementId) {
+        if (!elementList.contains(elementId)) {
             throw new IllegalArgumentException("Element ID not found in room");
         }
+        elementList.remove(elementId);
     }
 
 

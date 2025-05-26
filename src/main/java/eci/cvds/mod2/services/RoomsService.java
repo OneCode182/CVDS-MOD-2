@@ -26,6 +26,7 @@ public class RoomsService {
     }
 
     public List<Room> getRoomsByBuilding(char building) {
+
         return roomRepo.findByBuilding(building);
     }
 
