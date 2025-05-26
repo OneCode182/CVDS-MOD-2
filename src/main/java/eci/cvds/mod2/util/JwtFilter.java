@@ -10,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,8 +47,7 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         if (header == null || !header.startsWith("Bearer ")) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Session error, no token");
-            return;
+            throw new BadCredentialsException("Session error, no token");
         }
 
         String token = header.substring(7);
@@ -78,8 +78,7 @@ public class JwtFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authToken);
 
         } catch (JWTVerificationException e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Tu sesión ya expiró");
-            return;
+            throw new BadCredentialsException("Tu sesión ya expiró");
         }
 
         chain.doFilter(request, response);

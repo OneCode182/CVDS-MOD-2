@@ -1,12 +1,14 @@
 package eci.cvds.mod2.controllers;
 
 import eci.cvds.mod2.modules.RecreationalElement;
+import eci.cvds.mod2.modules.Room;
 import eci.cvds.mod2.services.ElementsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/elements")
+@CrossOrigin(origins = "*")
 @Tag(name = "Elementos Recreativos", description = "Operaciones relacionadas con elementos recreativos")
 public class ElementsController {
     ElementsService elementsService;
@@ -135,5 +138,20 @@ public class ElementsController {
     public List<RecreationalElement> getAll(){
         return elementsService.getAll();
     }
-
+    @PutMapping("/reduce/{elementId}")
+    public ResponseEntity<String> reduceElementQuantity(@PathVariable String elementId, int loanNumber){
+        elementsService.reduceElementQuantity(elementId, loanNumber);
+        return ResponseEntity.ok("The capacity was successfully reduced");
+    }
+    @Operation(summary = "Aumentar la capacidad de una sala")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "The capacity was successfully increased",
+                    content = @Content(schema = @Schema(implementation = Room.class))),
+            @ApiResponse(responseCode = "404", description = "The room searched was not found")
+    })
+    @PutMapping("/increase/{elementId}")
+    public ResponseEntity<String> increaseElementQuantity(@PathVariable String elementId, int loanNumber){
+        elementsService.increaseElementQuantity(elementId, loanNumber);
+        return ResponseEntity.ok("The capacity was successfully increased");
+    }
 }
